@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Investitions-Quiz</title>
+    <style>
+        :root {
+            --easy-color: #27ae60;
+            --medium-color: #f1c40f;
+            --hard-color: #e74c3c;
+            --special-color: #8e44ad;
+            --death-color: #ff0000;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: white;
+        }
+
+        .teams {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .team {
+            padding: 20px;
+            border-radius: 10px;
+            background: #2c3e50;
+            min-width: 200px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .team.active {
+            box-shadow: 0 0 15px #e67e22;
+            transform: scale(1.05);
+        }
+
+        .points {
+            font-size: 24px;
+            color: #e67e22;
+            margin: 10px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            padding: 20px;
+        }
+
+        .question-card {
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .easy { background: var(--easy-color); border: 3px solid #1d8348; }
+        .medium { background: var(--medium-color); border: 3px solid #b7950b; }
+        .hard { background: var(--hard-color); border: 3px solid #c0392b; }
+        .special { background: var(--special-color); border: 3px solid #6c3483; }
+        .death { background: var(--death-color); border: 3px solid #8b0000; }
+
+        .question-card.used {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(0.95);
+        }
+
+        .question-card.selected {
+            box-shadow: 0 0 15px white;
+            transform: scale(1.05);
+        }
+
+        .points-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        button {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #d35400;
+            transform: scale(1.05);
+        }
+
+        .question-display {
+            background: #34495e;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2c3e50;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .timer {
+            font-size: 24px;
+            color: #e74c3c;
+            margin: 15px 0;
+        }
+
+        .joker {
+            animation: joker-glow 1s infinite alternate;
+        }
+
+        .timer-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        @keyframes joker-glow {
+            from { box-shadow: 0 0 5px #fff; }
+            to { box-shadow: 0 0 20px #ff0; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🏭 Investitions-Quiz</h1>
+
+    <div class="controls">
+        <button onclick="startGame(1)">1 Team</button>
+        <button onclick="startGame(2)">2 Teams</button>
+        <button onclick="startGame(3)">3 Teams</button>
+    </div>
+
+    <div class="teams" id="teamsContainer"></div>
+
+    <div class="grid" id="questionsGrid"></div>
+
+    <div class="question-display" id="questionDisplay">
+        Wählen Sie eine Frage aus der QUIZ-Wand!
+    </div>
+
+    <script>
+        const questions = {
+            easy: [
+                {
+                    question: "🎉 JOKER: Sofortpunkte! Klicke einfach auf 'Antwort anzeigen' und erhalte die Punkte ohne Antwort!",
+                    explanation: "✅ Punkte wurden automatisch gutgeschrieben!",
+                    points: 200,
+                    joker: true
+                },
+                {
+                    question: "Ein Unternehmen plant eine neue Investition. Neben der Wirtschaftlichkeit müssen auch andere Aspekte berücksichtigt werden. Nenne zwei dieser Aspekte und erkläre sie kurz an einem Beispiel.",
+                    explanation: "Antwort:<br><br>• Umweltaspekte: z.B. Energieverbrauch der neuen Anlage, CO2-Ausstoß<br>• Soziale Aspekte: z.B. Auswirkungen auf Arbeitsplätze und Arbeitsbedingungen",
+                    points: 200
+                },
+                {
+                    question: "Sport Lilly e.K. möchte ein Laufband für Laufanalysen für 20.000 € kaufen. Es stehen 10.000 € Eigenkapital zur Verfügung und 5.000 € an liquiden Mittel, die für das laufende Geschäft (z.B. Zahlung von Rechnungen) benötigt werden. Wie hoch muss die Fremdfinanzierung über z.B. Kredite sein?",
+                    explanation: "Antwort:<br><br>10.000 € müssen über Kredite finanziert werden.",
+                    points: 200
+                },
+                {
+                    question: "Nenne drei Gründe, warum ein Unternehmen investieren sollte, um wettbewerbsfähig zu bleiben.",
+                    explanation: "Antwort:<br><br>• Anlagen/Maschinen könnten veralten<br>• Technologien verändern sich<br>• Kundenanforderungen ändern sich",
+                    points: 200
+                },
+                {
+                    question: "Sport Lilly plant die Einführung von Self-Checkout-Kassen. Welche sozialen Folgen könnte diese Investition haben? Nenne einen Aspekt und begründe ihn",
+                    explanation: "Antwort:<br><br>• Verlust von Arbeitsplätzen, da weniger Kassierer benötigt werden<br>• Ältere Kunden könnten sich mit der Technik überfordert fühlen und den Laden meiden",
+                    points: 200
+                },
+                {
+                    question: "Die Deutsche Bahn kämpft mit Problemen bei der Pünktlichkeit und Zuverlässigkeit. Welche Investitionen hätten frühzeitig getätigt werden sollen, um dem entgegenzuwirken? Nenne zwei Aspekte.",
+                    explanation: "Antwort:<br><br>Investition in Infrastruktur wie Gleise, Personal",
+                    points: 200
+                }
+            ],
+            medium: [
+                {
+                    question: "Sport Lilly investiert in einen KI Chatbot um Kunden beim Online Shoppen zu beraten.  Die Investition in den KI Chatbot kostet 100.000 €. Die Automatisierung spart Kosten in Höhe von 15.000 EUR im Jahr und verursacht Wartungskosten in Höhte von 1.000 pro Jahr. Wie hoch ist die jährliche Ersparnis?",
+                    explanation: "Antwort:<br><br>15.000 - 1.000 = 14.000 €",
+                    points: 400
+                },
+                {
+                    question: "Der Verkaufsladen von Ingolstadt ist nun bereits 15 Jahre alt. Das Geschäft läuft wunderbar und die Prognose sieht für die nächsten Jahre weiterhin exzellent aus. Welche Investitionen könnten dennoch nötig sein? Nenne drei Investitionen!",
+                    explanation: "Antwort:<br><br>• Regale<br>• Anstrich<br>• Möbel<br>• Vergrößerung",
+                    points: 400
+                },
+                {
+                    question: "Sport Lilly plant eine zweite Filiale in Ingolstadt zu eröffnen, Kostenpunkt 500.000 EUR. Welche Möglichkeiten bestehen, um Investition zu finanzieren? Nenne eine eigene und fremde Finanzierungsmöglichkeit.",
+                    explanation: "Antwort:<br><br>Eigenfinanzierung: Gewinnrücklagen<br>Fremdfinanzierung: Bankkredit",
+                    points: 400
+                },
+                {
+                    question: "Sport Lilly verzichtete auf die Entwicklung einer eigenen Shopping-App (Kosten: 100.000 EUR), da die Verkaufsprognosen auch mit den bestehenden Vertriebswegen (Filialen und Online-Shop) positiv sind. Welche langfristigen Geschäftsrisiken könnten durch diese Entscheidung entstehen? Nenne zwei Risiken!",
+                    explanation: "Antwort:<br><br>• Kundenabwanderung zu Konkurrenten<br>• Fehlende Digitalisierungsstrategie",
+                    points: 400
+                },
+                {
+                    question: "Sport Lilly möchte in eine neue Filiale bauen. Welche wirtschaftlichen, ökologischen und sozialen Aspekte sind dabei relevant? Nenne jeweils einen Punkt!",
+                    explanation: "Antwort:<br><br>• Wirtschaftlich: ROI<br>• Ökologisch: Energieeffizienz<br>• Sozial: Arbeitsplätze",
+                    points: 400
+                },
+                {
+                    question: "Sport Lilly steht vor der Wahl: (A) Investition in eine automatisierte Lagerhaltung (Kosten: 300.000 €) oder (B) Erweiterung der Produktion in einem Niedriglohnland (Kosten: 150.000 €). Bewerten Sie die Optionen wirtschaftlich und ethisch!",
+                    explanation: "Antwort:<br><br>Wirtschaftlich: A ist billiger als B<br>Ethisch: B Ausbeutung, A Arbeitsplätze gehen womöglich verloren",
+                    points: 400
+                }
+            ],
+            hard: [
+                {
+                    question: "Sport Lilly investiert in einen KI Chatbot um Kunden beim Online Shoppen zu beraten. Die Investition in den KI Chatbot kostet 100.000 €. Der bisherige Service durch Menschen kostete 25.000 EUR im Jahr. Die Ersparnis durch die Investition liegt jährlich bei 10.000 EUR. Ab welchem Jahr amortisiert sich die Investition (sind die Kosten wieder reingeholt)?",
+                    explanation: "Antwort:<br><br>100.000 / 10.000 = 10 Jahre",
+                    points: 600
+                },
+                {
+                    question: "Sport Lilly setzt auf traditionelle Verkaufsmöglichkeiten, wie Filialen und einen Online-Shop. Der Geschäftsführer überlegt nun, ob er in Social Media Marketing investieren soll. Influencer auf Instagram und TikTok würden 50.000 EUR im ersten Jahr kosten. Durch die erhöhte Reichweite werden Mehreinnahmen von 40.000 EUR erwartet. Die Kosten für Influencer steigen im zweiten Jahr auf 60.000 EUR, die erwarteten Mehreinnahmen auf 85.000 EUR. Berechne den Gewinn/Verlust nach zwei Jahren.",
+                    explanation: "Antwort:<br><br>J1: -10.000 €<br>J2: +25.000 €<br>Gesamt: +15.000 €",
+                    points: 600
+                },
+                {
+                    question: "Sport Lilly erwägt die Investition in eine eigene Produktlinie für nachhaltige Sportbekleidung. Welche Aspekte müssen bei dieser Entscheidung berücksichtigt werden? Nenne 3 Aspekte.",
+                    explanation: "Antwort:<br><br>• Nachfrage<br>• Produktionskosten, Einkauf<br>• Konkurrenz<br>• Zertifizierungen",
+                    points: 600
+                },
+                {
+                    question: "Sport Lilly steht vor der Entscheidung zwischen der Modernisierung des bestehenden Hauptgeschäfts oder der Eröffnung einer neuen Filiale in einem aufstrebenden Stadtteil. Nenne zwei Punkte, die für die Modernisierung und zwei Punkte, die für die neue Filiale sprechen könnten.",
+                    explanation: "Antwort:<br><br>Modernisierung:<br>• Kundenbindung durch verbessertes Einkaufserlebnis<br>• Reduzierung des geschäftlichen Risikos durch etablierten Standort<br>Neue Filiale:<br>• Erschließung neuer Kundengruppen<br>• Chance auf zusätzliches Wachstum",
+                    points: 600
+                },
+                {
+                    question: "5. Für eine Expansion benötigt Sport Lilly 1 Mio. €. Das Unternehmen hat 400.000 € Eigenkapital und einen Kreditrahmen von 800.000 €. Die Bank finanziert maximal 70 % der Investition. Ist die Expansion finanziell möglich? Begründe mit Berechnungen.",
+                    explanation: "Antwort:<br><br>Bankbedingung: 70 % Fremdfinanzierung → 1.000.000 × 0,7 = 700.000 €. Da der Kreditrahmen bei 800.000 € liegt, ist die Finanzierung möglich. Eigenkapitalanteil: 300.000 € (400.000 € vorhanden → ausreichend).",
+                    points: 600
+                }
+            ],
+            death: [
+                {
+                    question: "💀 FINGER DES TODES 💀 (1000 Punkte)",
+                    explanation: "Aufgabe:<br><br>Gehe in ein Nachbarklassenzimmer und frage höflich nach einem Whiteboard-Stift. Komme so schnell wie möglich zurück und schreibe eine Investition, die die Dieter-Hildebrandt-Wirtschaftsschule tätigen sollte, an die Tafel!",
+                    points: 1000,
+                    special: true
+                }
+            ]
+        };
+
+        let teams = [];
+        let currentTeam = 0;
+        let selectedQuestion = null;
+        let countdownInterval = null;
+        let timeLeft = 0;
+        let timerRunning = false;
+
+        function startGame(teamCount) {
+            teams = Array.from({length: teamCount}, (_, i) => ({
+                name: `Team ${i + 1}`,
+                points: 0
+            }));
+            
+            Object.values(questions).forEach(category => {
+                category.forEach(q => {
+                    q.used = false;
+                    q.selected = false;
+                    q.attempts = 0;
+                });
+            });
+
+            currentTeam = 0;
+            clearInterval(countdownInterval);
+            timerRunning = false;
+            renderTeams();
+            createQuestionGrid();
+            document.getElementById("questionDisplay").innerHTML = "Wählen Sie eine Frage aus der QUIZ-Wand!";
+        }
+
+        function renderTeams() {
+            const container = document.getElementById("teamsContainer");
+            container.innerHTML = teams.map((team, index) => `
+                <div class="team ${index === currentTeam ? 'active' : ''}">
+                    <h3>${team.name}</h3>
+                    <div class="points">${team.points} Punkte</div>
+                </div>
+            `).join('');
+        }
+
+        function createQuestionGrid() {
+            const grid = document.getElementById("questionsGrid");
+            grid.innerHTML = "";
+            
+            Object.entries(questions).forEach(([difficulty, items]) => {
+                items.forEach((q, index) => {
+                    const card = document.createElement("div");
+                    card.className = `question-card ${difficulty} ${q.used ? 'used' : ''} ${q.selected ? 'selected' : ''} ${q.joker ? 'joker' : ''}`;
+                    card.innerHTML = `
+                        <div class="points-badge">${q.attempts > 0 ? Math.floor(q.points/2) : q.points}</div>
+                        ${q.special ? '💀' : ''} ${difficulty.toUpperCase()}<br>
+                        Frage ${index + 1}
+                    `;
+                    
+                    if (!q.used) {
+                        card.onclick = () => selectQuestion(q, difficulty, index);
+                    }
+                    grid.appendChild(card);
+                });
+            });
+        }
+
+        function selectQuestion(question, difficulty, index) {
+            if (question.used) return;
+            
+            Object.values(questions).forEach(cat => cat.forEach(q => q.selected = false));
+            question.selected = true;
+            selectedQuestion = question;
+            createQuestionGrid();
+            
+            let seconds = 60;
+            if (difficulty === 'medium') seconds = 120;
+            if (difficulty === 'hard') seconds = 180;
+            if (difficulty === 'death') seconds = 75;
+
+            let displayHTML = `
+                <h3>${difficulty.toUpperCase()}-Frage (${question.attempts > 0 ? Math.floor(question.points/2) : question.points} Punkte)</h3>
+                <p>${question.question}</p>
+                <div class="timer" id="timerDisplay">Timer: ${formatTime(seconds)}</div>
+                <div class="timer-controls">
+                    <button id="timerControl" onclick="toggleTimer()">Timer starten</button>
+                    <button onclick="resetTimer()">Timer zurücksetzen</button>
+                </div>
+            `;
+
+            if (question.joker) {
+                displayHTML += `
+                    <button onclick="handleJoker()">Joker einsetzen 🎉</button>
+                    <div class="explanation" id="explanation" style="display:none">
+                        ${question.explanation}
+                    </div>
+                `;
+            } else if (difficulty === 'death') {
+                displayHTML += `
+                    <div class="explanation">
+                        ${question.explanation}
+                    </div>
+                    <div id="specialTaskButtons" style="margin-top:20px">
+                        <button onclick="handleSpecialSuccess()">Aufgabe geschafft ✅</button>
+                        <button onclick="handleAnswer(false)">Zeit abgelaufen ❌</button>
+                    </div>
+                `;
+            } else {
+                displayHTML += `
+                    <button onclick="revealAnswer()">Antwort anzeigen</button>
+                    <div class="explanation" id="explanation" style="display:none">
+                        ${question.explanation}
+                    </div>
+                    <div id="judgementButtons" style="display:none; margin-top:20px">
+                        <button onclick="handleAnswer(true)">Richtig ✅</button>
+                        <button onclick="handleAnswer(false)">Falsch ❌</button>
+                    </div>
+                `;
+            }
+
+            document.getElementById("questionDisplay").innerHTML = displayHTML;
+            timeLeft = seconds;
+            timerRunning = false;
+            updateTimerDisplay();
+        }
+
+        function resetTimer() {
+            const difficulty = Object.entries(questions).find(([_, cat]) => 
+                cat.includes(selectedQuestion)
+            )[0];
+            
+            if (difficulty === 'easy') timeLeft = 60;
+            else if (difficulty === 'medium') timeLeft = 120;
+            else if (difficulty === 'hard') timeLeft = 180;
+            else timeLeft = 75;
+            
+            updateTimerDisplay();
+        }
+
+        function toggleTimer() {
+            const timerButton = document.getElementById('timerControl');
+            if (!timerRunning) {
+                timerRunning = true;
+                timerButton.textContent = 'Timer stoppen';
+                startTimer(timeLeft);
+            } else {
+                timerRunning = false;
+                timerButton.textContent = 'Timer fortsetzen';
+                clearInterval(countdownInterval);
+            }
+        }
+
+        function startTimer(seconds) {
+            timeLeft = seconds;
+            updateTimerDisplay();
+            
+            countdownInterval = setInterval(() => {
+                if (timerRunning) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        if (selectedQuestion && !selectedQuestion.joker) {
+                            handleAnswer(false);
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            if (timerDisplay) {
+                timerDisplay.textContent = `Timer: ${formatTime(timeLeft)}`;
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function revealAnswer() {
+            document.getElementById('explanation').style.display = 'block';
+            document.getElementById('judgementButtons').style.display = 'block';
+        }
+
+        function handleJoker() {
+            teams[currentTeam].points += selectedQuestion.points;
+            selectedQuestion.used = true;
+            clearInterval(countdownInterval);
+            nextRound();
+        }
+
+        function handleSpecialSuccess() {
+            teams[currentTeam].points += selectedQuestion.points;
+            selectedQuestion.used = true;
+            clearInterval(countdownInterval);
+            nextRound();
+        }
+
+        function handleAnswer(isCorrect) {
+            clearInterval(countdownInterval);
+            timerRunning = false;
+            
+            if (isCorrect) {
+                const points = selectedQuestion.attempts > 0 
+                    ? Math.floor(selectedQuestion.points/2)
+                    : selectedQuestion.points;
+                
+                teams[currentTeam].points += points;
+                selectedQuestion.used = true;
+            } else {
+                selectedQuestion.attempts++;
+                if (selectedQuestion.attempts >= 2) {
+                    selectedQuestion.used = true;
+                }
+            }
+
+            selectedQuestion.selected = false;
+            currentTeam = (currentTeam + 1) % teams.length;
+            
+            renderTeams();
+            createQuestionGrid();
+            
+            document.getElementById("questionDisplay").innerHTML = `
+                <p>${isCorrect ? '✅ Richtige Antwort!' : '❌ Falsche Antwort oder Zeit abgelaufen!'}<br>
+                Nächste Runde: ${teams[currentTeam].name}</p>
+            `;
+            
+            checkGameEnd();
+        }
+
+        function nextRound() {
+            selectedQuestion.selected = false;
+            currentTeam = (currentTeam + 1) % teams.length;
+            renderTeams();
+            createQuestionGrid();
+            document.getElementById("questionDisplay").innerHTML = `
+                <p>Nächste Runde: ${teams[currentTeam].name}</p>
+            `;
+            checkGameEnd();
+        }
+
+        function checkGameEnd() {
+            const allUsed = Object.values(questions).every(category => 
+                category.every(q => q.used)
+            );
+            
+            if (allUsed) {
+                const winner = teams.reduce((prev, current) => 
+                    (prev.points > current.points) ? prev : current);
+                    
+                alert(`🏆 Spielende! Gewinner ist ${winner.name} mit ${winner.points} Punkten!`);
+                startGame(teams.length);
+            }
+        }
+    </script>
+</body>
+</html>
