@@ -81,16 +81,17 @@
       transform: scale(0.95);
     }
 
-    /* Wenn eine Karte ausgewählt wurde, soll sie blinken */
+    /* Hervorhebung der ausgewählten Karte: leuchtender Rand (pulsierende Animation) */
     .question-card.selected {
-      animation: blink 1s infinite;
+      z-index: 2;
       transform: scale(1.05);
+      animation: glow 1.5s infinite;
     }
 
-    @keyframes blink {
-      0%   { box-shadow: 0 0 15px white; }
-      50%  { box-shadow: 0 0 30px white; }
-      100% { box-shadow: 0 0 15px white; }
+    @keyframes glow {
+      0%   { box-shadow: 0 0 5px white; }
+      50%  { box-shadow: 0 0 20px white; }
+      100% { box-shadow: 0 0 5px white; }
     }
 
     .points-badge {
@@ -125,6 +126,7 @@
       transform: scale(1.05);
     }
 
+    /* Dieser Container wird für die inline angezeigte Frage genutzt */
     .question-display {
       background: #34495e;
       padding: 30px;
@@ -168,7 +170,7 @@
 
   <div class="grid" id="questionsGrid"></div>
 
-  <!-- Dieser Container wird nicht mehr verwendet, da die Fragen inline angezeigt werden -->
+  <!-- Dieser Container wird nicht mehr genutzt, da Fragen inline angezeigt werden -->
   <div class="question-display" id="questionDisplay" style="display:none">
     Wählen Sie eine Frage aus der QUIZ-Wand!
   </div>
@@ -188,7 +190,7 @@
           points: 200
         },
         {
-          question: "Sport Lilly e.K. möchte ein Laufband für Laufanalysen für 20.000 € kaufen. Es stehen 10.000 € Eigenkapital zur Verfügung und 5.000 € an liquiden Mittel, die für das laufende Geschäft (z.B. Zahlung von Rechnungen) benötigt werden. Wie hoch muss die Fremdfinanzierung über z.B. Kredite sein?",
+          question: "Sport Lilly e.K. möchte ein Laufband für Laufanalysen für 20.000 € kaufen. Es stehen 10.000 € Eigenkapital zur Verfügung und 5.000 € an liquiden Mitteln, die für das laufende Geschäft (z.B. Zahlung von Rechnungen) benötigt werden. Wie hoch muss die Fremdfinanzierung über z.B. Kredite sein?",
           explanation: "Antwort:<br><br>10.000 € müssen über Kredite finanziert werden.",
           points: 200
         },
@@ -210,7 +212,7 @@
       ],
       medium: [
         {
-          question: "Sport Lilly investiert in einen KI Chatbot um Kunden beim Online Shoppen zu beraten.  Die Investition in den KI Chatbot kostet 100.000 €. Die Automatisierung spart Kosten in Höhe von 15.000 EUR im Jahr und verursacht Wartungskosten in Höhte von 1.000 pro Jahr. Wie hoch ist die jährliche Ersparnis?",
+          question: "Sport Lilly investiert in einen KI Chatbot, um Kunden beim Online Shoppen zu beraten. Die Investition in den KI Chatbot kostet 100.000 €. Die Automatisierung spart Kosten in Höhe von 15.000 EUR im Jahr und verursacht Wartungskosten in Höhe von 1.000 pro Jahr. Wie hoch ist die jährliche Ersparnis?",
           explanation: "Antwort:<br><br>15.000 - 1.000 = 14.000 €",
           points: 400
         },
@@ -220,7 +222,7 @@
           points: 400
         },
         {
-          question: "Sport Lilly plant eine zweite Filiale in Ingolstadt zu eröffnen, Kostenpunkt 500.000 EUR. Welche Möglichkeiten bestehen, um Investition zu finanzieren? Nenne eine eigene und fremde Finanzierungsmöglichkeit.",
+          question: "Sport Lilly plant eine zweite Filiale in Ingolstadt zu eröffnen, Kostenpunkt 500.000 EUR. Welche Möglichkeiten bestehen, um die Investition zu finanzieren? Nenne eine eigene und fremde Finanzierungsmöglichkeit.",
           explanation: "Antwort:<br><br>Eigenfinanzierung: Gewinnrücklagen<br>Fremdfinanzierung: Bankkredit",
           points: 400
         },
@@ -242,7 +244,7 @@
       ],
       hard: [
         {
-          question: "Sport Lilly investiert in einen KI Chatbot um Kunden beim Online Shoppen zu beraten. Die Investition in den KI Chatbot kostet 100.000 €. Der bisherige Service durch Menschen kostete 25.000 EUR im Jahr. Die Ersparnis durch die Investition liegt jährlich bei 10.000 EUR. Ab welchem Jahr amortisiert sich die Investition (sind die Kosten wieder reingeholt)?",
+          question: "Sport Lilly investiert in einen KI Chatbot, um Kunden beim Online Shoppen zu beraten. Die Investition in den KI Chatbot kostet 100.000 €. Der bisherige Service durch Menschen kostete 25.000 EUR im Jahr. Die Ersparnis durch die Investition liegt jährlich bei 10.000 EUR. Ab welchem Jahr amortisiert sich die Investition (sind die Kosten wieder reingeholt)?",
           explanation: "Antwort:<br><br>100.000 / 10.000 = 10 Jahre",
           points: 600
         },
@@ -283,10 +285,11 @@
     let countdownInterval = null;
     let timeLeft = 0;
     let timerRunning = false;
+    // Referenz auf das aktuell geöffnete Karten-DOM-Element
     let openInlineQuestionCard = null;
 
     function startGame(teamCount) {
-      teams = Array.from({length: teamCount}, (_, i) => ({
+      teams = Array.from({ length: teamCount }, (_, i) => ({
         name: `Team ${i + 1}`,
         points: 0
       }));
@@ -323,9 +326,10 @@
       Object.entries(questions).forEach(([difficulty, items]) => {
         items.forEach((q, index) => {
           const card = document.createElement("div");
+          // Setze die CSS-Klasse "selected" je nach q.selected
           card.className = `question-card ${difficulty} ${q.used ? 'used' : ''} ${q.selected ? 'selected' : ''}`;
           card.innerHTML = `
-            <div class="points-badge">${q.attempts > 0 ? Math.floor(q.points/2) : q.points}</div>
+            <div class="points-badge">${q.attempts > 0 ? Math.floor(q.points / 2) : q.points}</div>
             ${q.special ? '💀' : ''} ${difficulty.toUpperCase()}<br>
             Frage ${index + 1}
           `;
@@ -341,23 +345,22 @@
     }
 
     function toggleInlineQuestion(card, question, difficulty, index) {
-      if(openInlineQuestionCard === card) {
-        const inline = document.getElementById("inlineQuestionDisplay");
-        if(inline) inline.remove();
-        openInlineQuestionCard = null;
+      // Falls dieselbe Karte bereits ausgewählt war: Schließe sie
+      if (openInlineQuestionCard === card) {
+        closeInlineQuestion();
         question.selected = false;
         return;
       }
-      const existingInline = document.getElementById("inlineQuestionDisplay");
-      if(existingInline) {
-        existingInline.remove();
-      }
-      if (selectedQuestion) {
-        selectedQuestion.selected = false;
+      
+      // Falls bereits eine andere Karte geöffnet ist, schließe diese
+      if (openInlineQuestionCard && openInlineQuestionCard !== card) {
+        closeInlineQuestion();
       }
       
+      // Markiere die aktuelle Frage als ausgewählt und füge die CSS-Klasse direkt hinzu
       selectedQuestion = question;
       question.selected = true;
+      card.classList.add("selected");
       openInlineQuestionCard = card;
       
       let seconds = 60;
@@ -371,8 +374,10 @@
       inlineContainer.id = "inlineQuestionDisplay";
       inlineContainer.className = "question-display";
       inlineContainer.style.gridColumn = "1 / -1";
+      
+      // Überschrift enthält jetzt zusätzlich die Frage-Nummer (index + 1) und die Punkte
       let displayHTML = `
-        <h3>${difficulty.toUpperCase()}-Frage (${question.attempts > 0 ? Math.floor(question.points/2) : question.points} Punkte)</h3>
+        <h3>${difficulty.toUpperCase()}-Frage ${index + 1} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
         <p>${question.question}</p>
         <div class="timer" id="timerDisplay">Timer: ${formatTime(seconds)}</div>
         <div class="timer-controls">
@@ -500,7 +505,7 @@
       
       if (isCorrect) {
         const points = selectedQuestion.attempts > 0 
-          ? Math.floor(selectedQuestion.points/2)
+          ? Math.floor(selectedQuestion.points / 2)
           : selectedQuestion.points;
         
         teams[currentTeam].points += points;
@@ -526,9 +531,13 @@
       checkGameEnd();
     }
 
+    // Entfernt den Inline-Fragencontainer und entfernt die "selected"-Klasse von der geöffneten Karte
     function closeInlineQuestion() {
       const inline = document.getElementById("inlineQuestionDisplay");
-      if(inline) inline.remove();
+      if (inline) inline.remove();
+      if (openInlineQuestionCard) {
+        openInlineQuestionCard.classList.remove("selected");
+      }
       openInlineQuestionCard = null;
     }
 
