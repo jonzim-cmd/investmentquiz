@@ -530,7 +530,7 @@
       inlineContainer.className = "question-display";
       inlineContainer.style.gridColumn = "1 / -1";
       
-      // Baue den HTML-Inhalt ohne inline onclicks – stattdessen nutzen wir Data-Attribute.
+      // Erstelle den HTML-Inhalt ohne inline onclicks – stattdessen werden Data-Attribute und Event-Listener genutzt.
       let displayHTML = `
         <h3>${difficulty.toUpperCase()}-Frage ${index + 1} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
         <p>${question.question}</p>
@@ -560,7 +560,7 @@
         resetTimer();
       });
       
-      // Antwort anzeigen: beim Klick werden Erklärung und Buttons sichtbar
+      // Antwort anzeigen: Beim Klick werden Erklärung und Buttons sichtbar
       inlineContainer.querySelector("button[data-action='showAnswer']").addEventListener("click", function() {
         inlineContainer.querySelector(".explanation").style.display = 'block';
         inlineContainer.querySelector(".judgementButtons").style.display = 'block';
@@ -634,6 +634,12 @@
     }
 
     function handleAnswer(isCorrect) {
+      // Fehlerprüfung: Falls selectedQuestion nicht definiert ist, abbrechen.
+      if (!selectedQuestion) {
+        console.error("Kein Frageobjekt ausgewählt!");
+        return;
+      }
+      
       clearInterval(countdownInterval);
       timerRunning = false;
       
@@ -650,7 +656,8 @@
           selectedQuestion.used = true;
         }
       }
-      selectedQuestion.selected = false;
+      // Setze selectedQuestion zurück, um unerwartete Seiteneffekte zu vermeiden.
+      selectedQuestion = null;
       closeInlineQuestion();
       currentTeam = (currentTeam + 1) % teams.length;
       
@@ -665,7 +672,7 @@
       checkGameEnd();
     }
 
-    // Entfernt den Inline-Fragencontainer und entfernt die "selected"-Klasse von der geöffneten Karte
+    // Entfernt den Inline-Fragencontainer, entfernt die "selected"-Klasse und setzt selectedQuestion zurück
     function closeInlineQuestion() {
       const inline = document.getElementById("inlineQuestionDisplay");
       if (inline) inline.remove();
@@ -673,10 +680,13 @@
         openInlineQuestionCard.classList.remove("selected");
       }
       openInlineQuestionCard = null;
+      selectedQuestion = null;
     }
 
     function nextRound() {
-      selectedQuestion.selected = false;
+      if (selectedQuestion) {
+        selectedQuestion.selected = false;
+      }
       closeInlineQuestion();
       currentTeam = (currentTeam + 1) % teams.length;
       renderTeams();
