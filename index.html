@@ -210,7 +210,7 @@
       font-size: 14px;
     }
 
-    /* Modernisierte Team-Buttons im Controls-Bereich (Glasdesign, Hover, Tiefenwirkung) */
+    /* Modernisierte Buttons im Controls-Bereich (Glasdesign, Hover, Tiefenwirkung) */
     .controls {
       display: flex;
       justify-content: center;
@@ -304,6 +304,8 @@
   <!-- Excel-Import UI – ausschließlich sichtbar, bis ein Report hochgeladen wurde -->
   <input type="file" id="excelUpload" accept=".xlsx" hidden>
   <button onclick="handleExcelUpload()">Excel Import 🗂️</button>
+  <!-- Alles zurücksetzen Button -->
+  <button onclick="resetAll()">Alles zurücksetzen</button>
 
   <!-- Spielsteuerung: erst nach Excel-Import werden hier Inhalte gefüllt -->
   <div class="controls" id="controls" style="display: none;">
@@ -718,6 +720,31 @@
         alert(`🏆 Spielende! Gewinner ist ${winner.name} mit ${winner.points} Punkten!`);
         startGame(teams.length);
       }
+    }
+
+    // Funktion zum kompletten Zurücksetzen (Reset)
+    function resetAll() {
+      // Globalen Zustand zurücksetzen
+      teams = [];
+      currentTeam = 0;
+      selectedQuestion = null;
+      clearInterval(countdownInterval);
+      timerRunning = false;
+      openInlineQuestionCard = null;
+      
+      // UI leeren bzw. zurücksetzen
+      document.getElementById("teamsContainer").innerHTML = "";
+      document.getElementById("questionsGrid").innerHTML = `<p style="text-align:center; color:#ccc;">Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.</p>`;
+      document.getElementById("questionDisplay").style.display = "none";
+      document.getElementById("controls").style.display = "none";
+      
+      // Fragenpool leeren
+      questions.easy = [];
+      questions.medium = [];
+      questions.hard = [];
+      questions.death = [];
+      
+      showToast("Alles zurückgesetzt!");
     }
   </script>
 </body>
