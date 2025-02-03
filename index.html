@@ -2,11 +2,13 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Investitions-Quiz</title>
+  <title>Quiz</title>
   <!-- Google Fonts: Poppins (Überschriften) und Open Sans (Fließtext) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <!-- xlsx Bibliothek -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
       /* Farbverläufe für die Kategorien */
@@ -126,6 +128,7 @@
       transition: all 0.3s ease;
       color: var(--heading-color);
       font-weight: 600;
+      background: rgba(44, 62, 80, 0.5);
     }
     .easy { background: var(--easy-gradient); }
     .medium { background: var(--medium-gradient); }
@@ -296,9 +299,14 @@
   </style>
 </head>
 <body>
-  <h1>Investitions-Quiz</h1>
+  <h1>Quiz</h1>
 
-  <div class="controls">
+  <!-- Excel-Import UI – ausschließlich sichtbar, bis ein Report hochgeladen wurde -->
+  <input type="file" id="excelUpload" accept=".xlsx" hidden>
+  <button onclick="handleExcelUpload()">Excel Import 🗂️</button>
+
+  <!-- Spielsteuerung: erst nach Excel-Import werden hier Inhalte gefüllt -->
+  <div class="controls" id="controls" style="display: none;">
     <button onclick="startGame(1)">1 Team</button>
     <button onclick="startGame(2)">2 Teams</button>
     <button onclick="startGame(3)">3 Teams</button>
@@ -306,115 +314,118 @@
 
   <div class="teams" id="teamsContainer"></div>
 
-  <div class="grid" id="questionsGrid"></div>
+  <div class="grid" id="questionsGrid">
+    <p style="text-align:center; color:#ccc;">Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.</p>
+  </div>
 
   <!-- Nicht genutzt – Fragen werden inline angezeigt -->
   <div class="question-display" id="questionDisplay" style="display:none">
-    Wählen Sie eine Frage aus der QUIZ-Wand!
+    Wählen Sie eine Frage aus der Quiz-Wand!
   </div>
 
   <script>
+    /*******************************
+     * Excel-Import Modul
+     *******************************/
+    async function handleExcelUpload() {
+      const fileInput = document.getElementById("excelUpload");
+      fileInput.click();
+      fileInput.onchange = async (e) => {
+        try {
+          const file = e.target.files[0];
+          if (!file) return;
+          const data = await file.arrayBuffer();
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          // Array of Arrays; leere Zellen als "" zurückgegeben
+          const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+          // Initialisiere leeres Import-Objekt
+          const importedQuestions = { easy: [], medium: [], hard: [], death: [] };
+          const categories = ["easy", "medium", "hard", "death"];
+          const headerRegex = /(easy|medium|hard|death)\s*\d+/i;
+
+          // Für jede Kategorie-Spalte (A=0, B=1, etc.)
+          for (let colIndex = 0; colIndex < categories.length; colIndex++) {
+            // Durchlaufe alle Zeilen
+            for (let row = 0; row < json.length; row++) {
+              const cell = json[row][colIndex];
+              if (typeof cell === "string" && cell.trim() && cell.match(headerRegex)) {
+                // Frage und Erklärung aus den nächsten beiden Zeilen
+                const questionText = json[row + 1] ? json[row + 1][colIndex] : "";
+                const explanationText = json[row + 2] ? json[row + 2][colIndex] : "";
+                if (!questionText.trim() || !explanationText.trim()) {
+                  showToast(`Fehler: Fehlende Frage oder Erklärung bei "${cell}"`);
+                  continue;
+                }
+                // Punkte je Kategorie
+                let points;
+                switch (categories[colIndex]) {
+                  case "easy": points = 200; break;
+                  case "medium": points = 400; break;
+                  case "hard": points = 600; break;
+                  case "death": points = 1000; break;
+                  default: points = 0;
+                }
+                const newQuestion = {
+                  question: questionText,
+                  explanation: explanationText,
+                  points: points,
+                  used: false,
+                  selected: false,
+                  attempts: 0,
+                  special: (categories[colIndex] === "death")
+                };
+                importedQuestions[categories[colIndex]].push(newQuestion);
+                // Überspringe den Block (Header, Frage, Erklärung, Leerzeile)
+                row += 3;
+              }
+            }
+          }
+
+          // Ersetze den globalen Fragenpool mit den importierten Fragen
+          questions.easy = importedQuestions.easy;
+          questions.medium = importedQuestions.medium;
+          questions.hard = importedQuestions.hard;
+          questions.death = importedQuestions.death;
+          
+          createQuestionGrid();
+          // Nach Import: Zeige die Spielsteuerung (Team-Auswahl) an
+          document.getElementById("controls").style.display = "flex";
+          showToast("Excel Import erfolgreich!");
+        } catch (err) {
+          console.error(err);
+          showToast("Fehler beim Importieren der Excel-Datei.");
+        }
+      };
+    }
+
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.textContent = message;
+      toast.style.position = "fixed";
+      toast.style.bottom = "20px";
+      toast.style.left = "50%";
+      toast.style.transform = "translateX(-50%)";
+      toast.style.background = "rgba(0,0,0,0.7)";
+      toast.style.color = "#ecf0f1";
+      toast.style.padding = "10px 20px";
+      toast.style.borderRadius = "5px";
+      toast.style.zIndex = "1000";
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 3000);
+    }
+
+    /*******************************
+     * Quiz-Logik
+     *******************************/
+    // Globaler Fragenpool – zunächst leer, bis ein Excel-Report importiert wurde
     const questions = {
-      easy: [
-        {
-          question: "🎉 JOKER: Sofortpunkte! Klicke einfach auf 'Antwort anzeigen' und erhalte die Punkte ohne Antwort!",
-          explanation: "✅ Punkte wurden automatisch gutgeschrieben!",
-          points: 200,
-          joker: true
-        },
-        {
-          question: "Ein Unternehmen plant eine neue Investition. Neben der Wirtschaftlichkeit müssen auch andere Aspekte berücksichtigt werden. Nenne zwei dieser Aspekte und erkläre sie kurz an einem Beispiel.",
-          explanation: "Antwort:<br><br>• Umweltaspekte: z.B. Energieverbrauch der neuen Anlage, CO2-Ausstoß<br>• Soziale Aspekte: z.B. Auswirkungen auf Arbeitsplätze und Arbeitsbedingungen",
-          points: 200
-        },
-        {
-          question: "Sport Lilly e.K. möchte ein Laufband für Laufanalysen für 20.000 € kaufen. Es stehen 10.000 € Eigenkapital zur Verfügung und 5.000 € an liquiden Mitteln, die für das laufende Geschäft (z.B. Zahlung von Rechnungen) benötigt werden. Wie hoch muss die Fremdfinanzierung über z.B. Kredite sein?",
-          explanation: "Antwort:<br><br>10.000 € müssen über Kredite finanziert werden.",
-          points: 200
-        },
-        {
-          question: "Nenne drei Gründe, warum ein Unternehmen investieren sollte, um wettbewerbsfähig zu bleiben.",
-          explanation: "Antwort:<br><br>• Anlagen/Maschinen könnten veralten<br>• Technologien verändern sich<br>• Kundenanforderungen ändern sich",
-          points: 200
-        },
-        {
-          question: "Sport Lilly plant die Einführung von Self-Checkout-Kassen. Welche sozialen Folgen könnte diese Investition haben? Nenne einen Aspekt und begründe ihn",
-          explanation: "Antwort:<br><br>• Verlust von Arbeitsplätzen, da weniger Kassierer benötigt werden<br>• Ältere Kunden könnten sich mit der Technik überfordert fühlen und den Laden meiden",
-          points: 200
-        },
-        {
-          question: "Die Deutsche Bahn kämpft mit Problemen bei der Pünktlichkeit und Zuverlässigkeit. Welche Investitionen hätten frühzeitig getätigt werden sollen, um dem entgegenzuwirken? Nenne zwei Aspekte.",
-          explanation: "Antwort:<br><br>Investition in Infrastruktur wie Gleise, Personal",
-          points: 200
-        }
-      ],
-      medium: [
-        {
-          question: "Sport Lilly investiert in einen KI Chatbot, um Kunden beim Online Shoppen zu beraten. Die Investition in den KI Chatbot kostet 100.000 €. Die Automatisierung spart Kosten in Höhe von 15.000 EUR im Jahr und verursacht Wartungskosten in Höhe von 1.000 pro Jahr. Wie hoch ist die jährliche Ersparnis?",
-          explanation: "Antwort:<br><br>15.000 - 1.000 = 14.000 €",
-          points: 400
-        },
-        {
-          question: "Der Verkaufsladen von Ingolstadt ist nun bereits 15 Jahre alt. Das Geschäft läuft wunderbar und die Prognose sieht für die nächsten Jahre weiterhin exzellent aus. Welche Investitionen könnten dennoch nötig sein? Nenne drei Investitionen!",
-          explanation: "Antwort:<br><br>• Regale<br>• Anstrich<br>• Möbel<br>• Vergrößerung",
-          points: 400
-        },
-        {
-          question: "Sport Lilly plant eine zweite Filiale in Ingolstadt zu eröffnen, Kostenpunkt 500.000 EUR. Welche Möglichkeiten bestehen, um die Investition zu finanzieren? Nenne eine eigene und fremde Finanzierungsmöglichkeit.",
-          explanation: "Antwort:<br><br>Eigenfinanzierung: Gewinnrücklagen<br>Fremdfinanzierung: Bankkredit",
-          points: 400
-        },
-        {
-          question: "Sport Lilly verzichtete auf die Entwicklung einer eigenen Shopping-App (Kosten: 100.000 EUR), da die Verkaufsprognosen auch mit den bestehenden Vertriebswegen (Filialen und Online-Shop) positiv sind. Welche langfristigen Geschäftsrisiken könnten durch diese Entscheidung entstehen? Nenne zwei Risiken!",
-          explanation: "Antwort:<br><br>• Kundenabwanderung zu Konkurrenten<br>• Fehlende Digitalisierungsstrategie",
-          points: 400
-        },
-        {
-          question: "Sport Lilly möchte in eine neue Filiale bauen. Welche wirtschaftlichen, ökologischen und sozialen Aspekte sind dabei relevant? Nenne jeweils einen Punkt!",
-          explanation: "Antwort:<br><br>• Wirtschaftlich: ROI<br>• Ökologisch: Energieeffizienz<br>• Sozial: Arbeitsplätze",
-          points: 400
-        },
-        {
-          question: "Sport Lilly steht vor der Wahl: (A) Investition in eine automatisierte Lagerhaltung (Kosten: 300.000 €) oder (B) Erweiterung der Produktion in einem Niedriglohnland (Kosten: 150.000 €). Bewerten Sie die Optionen wirtschaftlich und ethisch!",
-          explanation: "Antwort:<br><br>Wirtschaftlich: A ist billiger als B<br>Ethisch: B Ausbeutung, A Arbeitsplätze gehen womöglich verloren",
-          points: 400
-        }
-      ],
-      hard: [
-        {
-          question: "Sport Lilly investiert in einen KI Chatbot, um Kunden beim Online Shoppen zu beraten. Die Investition in den KI Chatbot kostet 100.000 €. Der bisherige Service durch Menschen kostete 25.000 EUR im Jahr. Die Ersparnis durch die Investition liegt jährlich bei 10.000 EUR. Ab welchem Jahr amortisiert sich die Investition (sind die Kosten wieder reingeholt)?",
-          explanation: "Antwort:<br><br>100.000 / 10.000 = 10 Jahre",
-          points: 600
-        },
-        {
-          question: "Sport Lilly setzt auf traditionelle Verkaufsmöglichkeiten, wie Filialen und einen Online-Shop. Der Geschäftsführer überlegt nun, ob er in Social Media Marketing investieren soll. Influencer auf Instagram und TikTok würden 50.000 EUR im ersten Jahr kosten. Durch die erhöhte Reichweite werden Mehreinnahmen von 40.000 EUR erwartet. Die Kosten für Influencer steigen im zweiten Jahr auf 60.000 EUR, die erwarteten Mehreinnahmen auf 85.000 EUR. Berechne den Gewinn/Verlust nach zwei Jahren.",
-          explanation: "Antwort:<br><br>J1: -10.000 €<br>J2: +25.000 €<br>Gesamt: +15.000 €",
-          points: 600
-        },
-        {
-          question: "Sport Lilly erwägt die Investition in eine eigene Produktlinie für nachhaltige Sportbekleidung. Welche Aspekte müssen bei dieser Entscheidung berücksichtigt werden? Nenne 3 Aspekte.",
-          explanation: "Antwort:<br><br>• Nachfrage<br>• Produktionskosten, Einkauf<br>• Konkurrenz<br>• Zertifizierungen",
-          points: 600
-        },
-        {
-          question: "Sport Lilly steht vor der Entscheidung zwischen der Modernisierung des bestehenden Hauptgeschäfts oder der Eröffnung einer neuen Filiale in einem aufstrebenden Stadtteil. Nenne zwei Punkte, die für die Modernisierung und zwei Punkte, die für die neue Filiale sprechen könnten.",
-          explanation: "Antwort:<br><br>Modernisierung:<br>• Kundenbindung durch verbessertes Einkaufserlebnis<br>• Reduzierung des geschäftlichen Risikos durch etablierten Standort<br>Neue Filiale:<br>• Erschließung neuer Kundengruppen<br>• Chance auf zusätzliches Wachstum",
-          points: 600
-        },
-        {
-          question: "5. Für eine Expansion benötigt Sport Lilly 1 Mio. €. Das Unternehmen hat 400.000 € Eigenkapital und einen Kreditrahmen von 800.000 €. Die Bank finanziert maximal 70 % der Investition. Ist die Expansion finanziell möglich? Begründe mit Berechnungen.",
-          explanation: "Antwort:<br><br>Bankbedingung: 70 % Fremdfinanzierung → 1.000.000 × 0,7 = 700.000 €. Da der Kreditrahmen bei 800.000 € liegt, ist die Finanzierung möglich. Eigenkapitalanteil: 300.000 € (400.000 € vorhanden → ausreichend).",
-          points: 600
-        }
-      ],
-      death: [
-        {
-          question: "💀 FINGER DES TODES 💀 (1000 Punkte)",
-          explanation: "Aufgabe:<br><br>Gehe in ein Nachbarklassenzimmer und frage höflich nach einem Whiteboard-Stift. Komme so schnell wie möglich zurück und schreibe eine Investition, die die Dieter-Hildebrandt-Wirtschaftsschule tätigen sollte, an die Tafel!",
-          points: 1000,
-          special: true
-        }
-      ]
+      easy: [],
+      medium: [],
+      hard: [],
+      death: []
     };
 
     let teams = [];
@@ -461,7 +472,9 @@
       const grid = document.getElementById("questionsGrid");
       grid.innerHTML = "";
       
+      let hasQuestions = false;
       Object.entries(questions).forEach(([difficulty, items]) => {
+        if (items.length) hasQuestions = true;
         items.forEach((q, index) => {
           const card = document.createElement("div");
           card.className = `question-card ${difficulty} ${q.used ? 'used' : ''} ${q.selected ? 'selected' : ''}`;
@@ -479,6 +492,9 @@
           grid.appendChild(card);
         });
       });
+      if (!hasQuestions) {
+        grid.innerHTML = `<p style="text-align:center; color:#ccc;">Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.</p>`;
+      }
     }
 
     function toggleInlineQuestion(card, question, difficulty, index) {
@@ -494,7 +510,7 @@
         closeInlineQuestion();
       }
       
-      // Markiere die aktuelle Frage als ausgewählt und füge die CSS-Klasse direkt hinzu
+      // Markiere die aktuelle Frage als ausgewählt
       selectedQuestion = question;
       question.selected = true;
       card.classList.add("selected");
