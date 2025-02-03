@@ -530,49 +530,49 @@
       inlineContainer.className = "question-display";
       inlineContainer.style.gridColumn = "1 / -1";
       
-      // Überschrift: Kategorie, Frage-Nummer und Punkte
+      // Baue den HTML-Inhalt ohne inline onclicks – stattdessen nutzen wir Data-Attribute.
       let displayHTML = `
         <h3>${difficulty.toUpperCase()}-Frage ${index + 1} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
         <p>${question.question}</p>
         <div class="timer" id="timerDisplay">Timer: ${formatTime(seconds)}</div>
         <div class="timer-controls">
-          <button id="timerControl" onclick="toggleTimer()">Timer starten</button>
-          <button onclick="resetTimer()">Timer zurücksetzen</button>
+          <button id="timerControl">Timer starten</button>
+          <button id="resetTimer">Timer zurücksetzen</button>
+        </div>
+        <button data-action="showAnswer">Antwort anzeigen</button>
+        <div class="explanation" style="display:none">
+          ${question.explanation}
+        </div>
+        <div class="judgementButtons" style="display:none; margin-top:20px">
+          <button data-answer="true">Richtig ✅</button>
+          <button data-answer="false">Falsch ❌</button>
         </div>
       `;
       
-      if (question.joker) {
-        displayHTML += `
-          <button onclick="handleJoker()">Joker einsetzen 🎉</button>
-          <div class="explanation" id="explanation" style="display:none">
-            ${question.explanation}
-          </div>
-        `;
-      } else if (difficulty === 'death') {
-        displayHTML += `
-          <div class="explanation">
-            ${question.explanation}
-          </div>
-          <div id="specialTaskButtons" style="margin-top:20px">
-            <button onclick="handleSpecialSuccess()">Aufgabe geschafft ✅</button>
-            <button onclick="handleAnswer(false)">Zeit abgelaufen ❌</button>
-          </div>
-        `;
-      } else {
-        displayHTML += `
-          <button onclick="revealAnswer()">Antwort anzeigen</button>
-          <div class="explanation" id="explanation" style="display:none">
-            ${question.explanation}
-          </div>
-          <div id="judgementButtons" style="display:none; margin-top:20px">
-            <button onclick="handleAnswer(true)">Richtig ✅</button>
-            <button onclick="handleAnswer(false)">Falsch ❌</button>
-          </div>
-        `;
-      }
-      
       inlineContainer.innerHTML = displayHTML;
       card.parentNode.insertBefore(inlineContainer, card.nextSibling);
+      
+      // Timer-Steuerung
+      inlineContainer.querySelector("#timerControl").addEventListener("click", () => {
+        toggleTimer();
+      });
+      inlineContainer.querySelector("#resetTimer").addEventListener("click", () => {
+        resetTimer();
+      });
+      
+      // Antwort anzeigen: beim Klick werden Erklärung und Buttons sichtbar
+      inlineContainer.querySelector("button[data-action='showAnswer']").addEventListener("click", function() {
+        inlineContainer.querySelector(".explanation").style.display = 'block';
+        inlineContainer.querySelector(".judgementButtons").style.display = 'block';
+      });
+      
+      // Event-Listener für die Antwort-Buttons
+      inlineContainer.querySelector("button[data-answer='true']").addEventListener("click", function() {
+        handleAnswer(true);
+      });
+      inlineContainer.querySelector("button[data-answer='false']").addEventListener("click", function() {
+        handleAnswer(false);
+      });
     }
 
     function resetTimer() {
@@ -631,27 +631,6 @@
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
       return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function revealAnswer() {
-      document.getElementById('explanation').style.display = 'block';
-      document.getElementById('judgementButtons').style.display = 'block';
-    }
-
-    function handleJoker() {
-      teams[currentTeam].points += selectedQuestion.points;
-      selectedQuestion.used = true;
-      clearInterval(countdownInterval);
-      closeInlineQuestion();
-      nextRound();
-    }
-
-    function handleSpecialSuccess() {
-      teams[currentTeam].points += selectedQuestion.points;
-      selectedQuestion.used = true;
-      clearInterval(countdownInterval);
-      closeInlineQuestion();
-      nextRound();
     }
 
     function handleAnswer(isCorrect) {
