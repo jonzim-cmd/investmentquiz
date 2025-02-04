@@ -574,7 +574,7 @@
       
       // Erstelle den HTML-Inhalt
       let displayHTML = `
-        <h3>${q.header ? q.header : `${difficulty.toUpperCase()}-Frage ${index + 1}`} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
+        <h3>${question.header ? question.header : `${difficulty.toUpperCase()}-Frage ${index + 1}`} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
         <p>${question.question}</p>
         <div class="timer" id="timerDisplay">Timer: ${formatTime(seconds)}</div>
         <div class="timer-controls">
