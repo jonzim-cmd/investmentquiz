@@ -21,6 +21,14 @@ function downloadExcelTemplate() {
     data.push(["Antwort", "Antwort", "Antwort", "Antwort"]);
     // Leere Zeile als Trenner
     data.push(["", "", "", ""]);
+    // Header-Zeile: z. B. "Easy 1", "Medium 1", "Hard 1", "Death 1"
+    data.push([`Easy ${i}`, `Medium ${i}`, `Hard ${i}`, `Death ${i}`]);
+    // Zeile mit "Frage" (wie in der Vorlage – hier ohne extra Leerzeichen, passe gerne an)
+    data.push(["Frage", "Frage", "Frage", "Frage"]);
+    // Zeile mit "Antwort"
+    data.push(["Antwort", "Antwort", "Antwort", "Antwort"]);
+    // Leere Zeile als Trenner
+    data.push(["", "", "", ""]);
   }
 
   // Erstelle ein Arbeitsblatt aus dem Array of Arrays
