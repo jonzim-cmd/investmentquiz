@@ -299,6 +299,22 @@
       gap: 10px;
       justify-content: center;
     }
+
+    /* Button für Excel-Template-Download */
+    .download-template-btn {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid #27ae60;
+      font-size: 1.2em;
+      padding: 15px 30px;
+      margin: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      color: #ecf0f1;
+    }
+    .download-template-btn:hover {
+      transform: translateY(-3px);
+    }
   </style>
 </head>
 <body>
@@ -309,6 +325,11 @@
   <button onclick="handleExcelUpload()">Excel Import 🗂️</button>
   <!-- Alles zurücksetzen Button -->
   <button onclick="resetAll()">Alles zurücksetzen</button>
+  
+  <!-- Neuer Button: Excel-Template herunterladen -->
+  <button class="download-template-btn" onclick="downloadExcelTemplate()">
+    Excel-Template herunterladen
+  </button>
 
   <!-- Spielsteuerung: erst nach Excel-Import wird hier die Teamauswahl angezeigt -->
   <div class="controls" id="controls" style="display: none;">
@@ -801,5 +822,8 @@
       showToast("Alles zurückgesetzt!");
     }
   </script>
+
+  <!-- Binde die externe Datei für den Template-Download ein -->
+  <script src="download-template.js"></script>
 </body>
 </html>
