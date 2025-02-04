@@ -299,22 +299,6 @@
       gap: 10px;
       justify-content: center;
     }
-
-    /* Button für Excel-Template-Download */
-    .download-template-btn {
-      background: rgba(255,255,255,0.1);
-      border: 2px solid #27ae60;
-      font-size: 1.2em;
-      padding: 15px 30px;
-      margin: 15px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-      color: #ecf0f1;
-    }
-    .download-template-btn:hover {
-      transform: translateY(-3px);
-    }
   </style>
 </head>
 <body>
@@ -326,10 +310,8 @@
   <!-- Alles zurücksetzen Button -->
   <button onclick="resetAll()">Alles zurücksetzen</button>
   
-  <!-- Neuer Button: Excel-Template herunterladen -->
-  <button class="download-template-btn" onclick="downloadExcelTemplate()">
-    Excel-Template herunterladen
-  </button>
+  <!-- Button zum Excel-Template herunterladen (sieht genauso aus wie der Excel Import Button) -->
+  <button onclick="downloadExcelTemplate()">Excel-Template herunterladen</button>
 
   <!-- Spielsteuerung: erst nach Excel-Import wird hier die Teamauswahl angezeigt -->
   <div class="controls" id="controls" style="display: none;">
@@ -440,12 +422,16 @@
           }
         }
 
-        // Ersetze den globalen Fragenpool mit den importierten Fragen
-        questions.easy = importedQuestions.easy;
-        questions.medium = importedQuestions.medium;
-        questions.hard = importedQuestions.hard;
-        questions.death = importedQuestions.death;
-        
+        // Merge-Logik: Bestehende Fragen bleiben erhalten
+        const mergedQuestions = {
+          easy: [...questions.easy, ...importedQuestions.easy],
+          medium: [...questions.medium, ...importedQuestions.medium],
+          hard: [...questions.hard, ...importedQuestions.hard],
+          death: [...questions.death, ...importedQuestions.death]
+        };
+
+        // Aktualisiere den globalen Fragenpool
+        Object.assign(questions, mergedQuestions);
         createQuestionGrid();
         // Nach Import: Zeige die Spielsteuerung (Team-Auswahl) an
         document.getElementById("controls").style.display = "flex";
