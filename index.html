@@ -633,32 +633,46 @@
       return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
+    // Angepasste handleAnswer-Funktion:
     function handleAnswer(isCorrect) {
-      // Fehlerprüfung: Falls selectedQuestion nicht definiert ist, abbrechen.
+      // Fehlerprüfung: Falls kein Frageobjekt ausgewählt ist, abbrechen.
       if (!selectedQuestion) {
         console.error("Kein Frageobjekt ausgewählt!");
         return;
+      }
+      
+      // Lokale Referenz, damit spätere Änderungen an selectedQuestion keinen Fehler verursachen.
+      const currentQuestion = selectedQuestion;
+      
+      // Deaktiviere alle Antwort-Buttons, um Mehrfachklicks zu verhindern.
+      const inlineContainer = document.getElementById("inlineQuestionDisplay");
+      if (inlineContainer) {
+        inlineContainer.querySelectorAll("button[data-answer]").forEach(btn => btn.disabled = true);
       }
       
       clearInterval(countdownInterval);
       timerRunning = false;
       
       if (isCorrect) {
-        const points = selectedQuestion.attempts > 0 
-          ? Math.floor(selectedQuestion.points / 2)
-          : selectedQuestion.points;
-        
+        const points = currentQuestion.attempts > 0 
+          ? Math.floor(currentQuestion.points / 2)
+          : currentQuestion.points;
         teams[currentTeam].points += points;
-        selectedQuestion.used = true;
+        currentQuestion.used = true;
       } else {
-        selectedQuestion.attempts++;
-        if (selectedQuestion.attempts >= 2) {
-          selectedQuestion.used = true;
+        currentQuestion.attempts++;
+        if (currentQuestion.attempts >= 2) {
+          currentQuestion.used = true;
         }
       }
-      // Setze selectedQuestion zurück, um unerwartete Seiteneffekte zu vermeiden.
-      selectedQuestion = null;
+      
+      // Setze den selected-Zustand zurück, damit die Kachel nicht mehr leuchtet.
+      currentQuestion.selected = false;
+      
+      // Entferne den Inline-Fragencontainer
       closeInlineQuestion();
+      
+      // Wechsle zum nächsten Team
       currentTeam = (currentTeam + 1) % teams.length;
       
       renderTeams();
