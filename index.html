@@ -769,7 +769,7 @@
 
     // Funktion zum kompletten Zurücksetzen (Reset)
     function resetAll() {
-      // Globalen Zustand zurücksetzen
+      // Reset global state
       teams = [];
       currentTeam = 0;
       selectedQuestion = null;
@@ -777,17 +777,21 @@
       timerRunning = false;
       openInlineQuestionCard = null;
       
-      // UI leeren bzw. zurücksetzen
+      // Clear UI elements
       document.getElementById("teamsContainer").innerHTML = "";
-      document.getElementById("questionsGrid").innerHTML = `<p style="text-align:center; color:#ccc;">Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.</p>`;
+      document.getElementById("questionsGrid").innerHTML = 
+        `<p style="text-align:center; color:#ccc;">Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.</p>`;
       document.getElementById("questionDisplay").style.display = "none";
       document.getElementById("controls").style.display = "none";
       
-      // Fragenpool leeren
+      // Clear questions arrays
       questions.easy = [];
       questions.medium = [];
       questions.hard = [];
       questions.death = [];
+      
+      // Reset file input to allow re-uploading the same file
+      document.getElementById("excelUpload").value = '';
       
       showToast("Alles zurückgesetzt!");
     }
