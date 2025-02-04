@@ -4,7 +4,11 @@
 
 function downloadExcelTemplate() {
   // Erstelle einen Array of Arrays (AOA) – jede innere Zeile entspricht einer Zeile in der Excel-Datei.
-  // Wir legen für jede Kategorie (Spalte) einen Block mit 4 Zeilen an.
+  // Wir legen für jede Kategorie (Spalte) einen Block mit 4 Zeilen an:
+  // 1. Zeile: Überschrift (z.B. "Easy 1")
+  // 2. Zeile: Beispiel-Frage (z.B. "Beispiel Frage")
+  // 3. Zeile: Beispiel-Antwort (z.B. "Beispiel Antwort")
+  // 4. Zeile: Leerzeile
   const data = [
     // Erste Zeile: Überschriften für jede Kategorie
     ["Easy 1", "Medium 1", "Hard 1", "Death 1"],
