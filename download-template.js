@@ -9,7 +9,7 @@ function downloadExcelTemplate() {
   // Zeile 2: "Beispiel Frage" in allen Spalten
   // Zeile 3: "Beispiel Antwort" in allen Spalten
   // Nach jeder Gruppe (außer der letzten) folgt eine leere Zeile als Trenner.
-  const groups = 4; 
+  const groups = 5; 
   const data = [];
 
   for (let i = 1; i <= groups; i++) {
