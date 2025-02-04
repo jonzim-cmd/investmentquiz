@@ -3,24 +3,26 @@
 // Stelle sicher, dass im HTML die xlsx-Bibliothek vor dieser Datei eingebunden wird.
 
 function downloadExcelTemplate() {
-  // Es sollen 2 Gruppen erzeugt werden, jeweils mit:
+  // Es sollen 2 Gruppen erzeugt werden.
+  // Jede Gruppe besteht aus:
   // Zeile 1: Überschriften (z. B. "Easy 1", "Medium 1", "Hard 1", "Death 1")
-  // Zeile 2: "Frage" in allen Spalten (mit führendem Leerzeichen, wenn gewünscht)
-  // Zeile 3: "Antwort" in allen Spalten (mit führendem Leerzeichen, wenn gewünscht)
-  // Zeile 4: Leere Zeile als Trenner
-
+  // Zeile 2: "Beispiel Frage" in allen Spalten
+  // Zeile 3: "Beispiel Antwort" in allen Spalten
+  // Nach jeder Gruppe (außer der letzten) folgt eine leere Zeile als Trenner.
   const groups = 2; 
   const data = [];
 
   for (let i = 1; i <= groups; i++) {
-    // Header-Zeile: z. B. "Easy 1", "Medium 1", "Hard 1", "Death 1"
+    // Überschriften-Zeile
     data.push([`Easy ${i}`, `Medium ${i}`, `Hard ${i}`, `Death ${i}`]);
-    // Zeile mit "Frage" (wie in der Vorlage – hier ohne extra Leerzeichen, passe gerne an)
-    data.push(["Frage", "Frage", "Frage", "Frage"]);
-    // Zeile mit "Antwort"
-    data.push(["Antwort", "Antwort", "Antwort", "Antwort"]);
-    // Leere Zeile als Trenner
-    data.push(["", "", "", ""]);
+    // Zeile mit "Beispiel Frage"
+    data.push(["Beispiel Frage", "Beispiel Frage", "Beispiel Frage", "Beispiel Frage"]);
+    // Zeile mit "Beispiel Antwort"
+    data.push(["Beispiel Antwort", "Beispiel Antwort", "Beispiel Antwort", "Beispiel Antwort"]);
+    // Nur zwischen Gruppen: Leere Zeile als Trenner
+    if (i < groups) {
+      data.push(["", "", "", ""]);
+    }
   }
 
   // Erstelle ein Arbeitsblatt aus dem Array of Arrays
