@@ -1,32 +1,35 @@
 // download-template.js
-// Diese Datei benötigt ebenfalls die xlsx-Bibliothek (xlsx.full.min.js)
-// Stelle sicher, dass die Bibliothek vor dieser Datei eingebunden wird.
+// Diese Datei benötigt ebenfalls die xlsx-Bibliothek (xlsx.full.min.js).
+// Stelle sicher, dass im HTML die xlsx-Bibliothek vor dieser Datei eingebunden wird.
 
 function downloadExcelTemplate() {
-  // Erstelle einen Array of Arrays (AOA) – jede innere Zeile entspricht einer Zeile in der Excel-Datei.
-  // Wir legen für jede Kategorie (Spalte) einen Block mit 4 Zeilen an:
-  // 1. Zeile: Überschrift (z.B. "Easy 1")
-  // 2. Zeile: Beispiel-Frage (z.B. "Beispiel Frage")
-  // 3. Zeile: Beispiel-Antwort (z.B. "Beispiel Antwort")
-  // 4. Zeile: Leerzeile
-  const data = [
-    // Erste Zeile: Überschriften für jede Kategorie
-    ["Easy 1", "Medium 1", "Hard 1", "Death 1"],
-    // Zweite Zeile: Beispiel-Fragen
-    ["Beispiel Frage", "Beispiel Frage", "Beispiel Frage", "Beispiel Frage"],
-    // Dritte Zeile: Beispiel-Antworten
-    ["Beispiel Antwort", "Beispiel Antwort", "Beispiel Antwort", "Beispiel Antwort"],
-    // Vierte Zeile: Leerzeile (optional)
-    ["", "", "", ""]
-  ];
+  // Es sollen 2 Gruppen erzeugt werden, jeweils mit:
+  // Zeile 1: Überschriften (z. B. "Easy 1", "Medium 1", "Hard 1", "Death 1")
+  // Zeile 2: "Frage" in allen Spalten (mit führendem Leerzeichen, wenn gewünscht)
+  // Zeile 3: "Antwort" in allen Spalten (mit führendem Leerzeichen, wenn gewünscht)
+  // Zeile 4: Leere Zeile als Trenner
 
-  // Erstelle ein Arbeitsblatt aus dem Array
+  const groups = 2; 
+  const data = [];
+
+  for (let i = 1; i <= groups; i++) {
+    // Header-Zeile: z. B. "Easy 1", "Medium 1", "Hard 1", "Death 1"
+    data.push([`Easy ${i}`, `Medium ${i}`, `Hard ${i}`, `Death ${i}`]);
+    // Zeile mit "Frage" (wie in der Vorlage – hier ohne extra Leerzeichen, passe gerne an)
+    data.push(["Frage", "Frage", "Frage", "Frage"]);
+    // Zeile mit "Antwort"
+    data.push(["Antwort", "Antwort", "Antwort", "Antwort"]);
+    // Leere Zeile als Trenner
+    data.push(["", "", "", ""]);
+  }
+
+  // Erstelle ein Arbeitsblatt aus dem Array of Arrays
   const worksheet = XLSX.utils.aoa_to_sheet(data);
 
   // Erstelle ein neues Arbeitsbuch (Workbook)
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
 
-  // Speichere das Arbeitsbuch als Excel-Datei; der Dateiname kann angepasst werden
+  // Speichere das Arbeitsbuch als Excel-Datei
   XLSX.writeFile(workbook, "quiz_template.xlsx");
 }
