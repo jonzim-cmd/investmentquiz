@@ -3,7 +3,7 @@
 // Stelle sicher, dass im HTML die xlsx-Bibliothek vor dieser Datei eingebunden wird.
 
 function downloadExcelTemplate() {
-  // Es sollen 2 Gruppen erzeugt werden.
+  // Es sollen 5 Gruppen erzeugt werden.
   // Jede Gruppe besteht aus:
   // Zeile 1: Überschriften (z. B. "Easy 1", "Medium 1", "Hard 1", "Death 1")
   // Zeile 2: "Beispiel Frage" in allen Spalten
