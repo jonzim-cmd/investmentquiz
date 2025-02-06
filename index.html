@@ -44,20 +44,22 @@
     <button onclick="initGame()">Spiel starten</button>
   </div>
 
+  <!-- Container für die Team-Anzeige -->
   <div class="teams" id="teamsContainer"></div>
 
+  <!-- Grid für die Fragen -->
   <div class="grid" id="questionsGrid">
     <p style="text-align:center; color:#ccc;">
       Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.
     </p>
   </div>
 
-  <!-- Nicht genutzt – Fragen werden inline angezeigt -->
+  <!-- Bereich, in dem die Frage (inline) angezeigt wird (initial ausgeblendet) -->
   <div class="question-display" id="questionDisplay" style="display:none">
     Wählen Sie eine Frage aus der Quiz-Wand!
   </div>
 
-  <!-- Skripte: direkt vor dem schließenden </body> einbinden -->
+  <!-- Skripte – bitte genau in dieser Reihenfolge einbinden -->
   <script src="app.js"></script>
   <script src="excel-import.js"></script>
   <script src="download-template.js"></script>
