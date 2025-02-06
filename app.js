@@ -322,7 +322,7 @@ function resetAll() {
   questions.hard = [];
   questions.death = [];
   
-  // Hier prüfen wir, ob das Element existiert, bevor wir den Wert zurücksetzen:
+  // Reset file input to allow re-uploading the same file
   const excelInput = document.getElementById("excelUpload");
   if (excelInput) {
     excelInput.value = '';
