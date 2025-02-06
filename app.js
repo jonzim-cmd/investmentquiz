@@ -301,6 +301,7 @@ function checkGameEnd() {
 }
 
 function resetAll() {
+  // Reset global state
   teams = [];
   currentTeam = 0;
   selectedQuestion = null;
@@ -308,18 +309,24 @@ function resetAll() {
   timerRunning = false;
   openInlineQuestionCard = null;
   
+  // Clear UI elements
   document.getElementById("teamsContainer").innerHTML = "";
   document.getElementById("questionsGrid").innerHTML = 
     `<p style="text-align:center; color:#ccc;">Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.</p>`;
   document.getElementById("questionDisplay").style.display = "none";
   document.getElementById("controls").style.display = "none";
   
+  // Clear questions arrays
   questions.easy = [];
   questions.medium = [];
   questions.hard = [];
   questions.death = [];
   
-  document.getElementById("excelUpload").value = '';
+  // Hier prüfen wir, ob das Element existiert, bevor wir den Wert zurücksetzen:
+  const excelInput = document.getElementById("excelUpload");
+  if (excelInput) {
+    excelInput.value = '';
+  }
   
   showToast("Alles zurückgesetzt!");
 }
