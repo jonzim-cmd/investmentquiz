@@ -283,21 +283,22 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
 }
 
-/* Modal (Anleitung) */
+/* Modal (Anleitung) – Dark Mode Version */
 .anleitung-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.9);  /* dunkler als vorher */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
 }
 .anleitung-modal {
-  background: #fff;
+  background: #222;  /* dunkles Modal */
+  color: #fff;       /* weiße Schrift */
   width: 80%;
   max-width: 600px;
   max-height: 80%;
@@ -312,10 +313,13 @@ h1, h2, h3, h4, h5, h6 {
   right: 20px;
   font-size: 28px;
   cursor: pointer;
+  color: #fff;
 }
 .anleitung-content-container {
   margin-top: 40px;
   max-height: 70vh;
   overflow-y: auto;
   padding-right: 10px;
+  /* Falls nötig: Textfarbe explizit auf Weiß setzen */
+  color: #fff;
 }
