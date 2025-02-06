@@ -15,6 +15,9 @@
 <body>
   <h1>Quiz</h1>
 
+  <!-- Datei-Input für Excel Import (versteckt) -->
+  <input type="file" id="excelUpload" accept=".xlsx" hidden>
+
   <!-- Obere Aktionsleiste -->
   <div class="action-bar">
     <button onclick="handleExcelUpload()">Excel Import 🗂️</button>
@@ -54,7 +57,7 @@
     Wählen Sie eine Frage aus der Quiz-Wand!
   </div>
 
-  <!-- Skripte: Reihenfolge beachten -->
+  <!-- Skripte: direkt vor dem schließenden </body> einbinden -->
   <script src="app.js"></script>
   <script src="excel-import.js"></script>
   <script src="download-template.js"></script>
