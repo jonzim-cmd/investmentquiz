@@ -96,6 +96,10 @@ document.addEventListener("DOMContentLoaded", function() {
       // Aktualisiere den globalen Fragenpool
       Object.assign(questions, mergedQuestions);
       createQuestionGrid();
+      
+      // Nach einem erfolgreichen Import die Team-Auswahl anzeigen
+      document.getElementById("controls").style.display = "flex";
+      
       showToast("Excel Import erfolgreich!");
     } catch (err) {
       console.error(err);
