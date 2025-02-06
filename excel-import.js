@@ -5,14 +5,14 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-async function handleExcelUpload() {
+// Sobald das DOM geladen ist, registrieren wir den "change"-Event
+document.addEventListener("DOMContentLoaded", function() {
   const fileInput = document.getElementById("excelUpload");
   if (!fileInput) {
-    console.error("Datei-Input nicht gefunden!");
+    console.error("Datei-Input nicht gefunden im DOM!");
     return;
   }
-  fileInput.click();
-  fileInput.onchange = async (e) => {
+  fileInput.addEventListener("change", async (e) => {
     try {
       const file = e.target.files[0];
       if (!file) return;
@@ -101,7 +101,19 @@ async function handleExcelUpload() {
       console.error(err);
       showToast("Fehler beim Importieren der Excel-Datei.");
     }
-  };
+  });
+});
+
+// Diese Funktion wird vom Excel-Import-Button aufgerufen
+async function handleExcelUpload() {
+  const fileInput = document.getElementById("excelUpload");
+  if (!fileInput) {
+    console.error("Datei-Input nicht gefunden!");
+    return;
+  }
+  // Setze den Wert zurück, damit auch die gleiche Datei erneut ausgewählt werden kann
+  fileInput.value = '';
+  fileInput.click();
 }
 
 function showToast(message) {
