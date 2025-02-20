@@ -1,8 +1,10 @@
+/* Allgemeine Styles */
 body {
   font-family: 'Open Sans', sans-serif;
   padding: 20px;
   background-color: #f5f5f5;
   color: #333;
+  margin: 0;
 }
 header {
   text-align: center;
@@ -20,20 +22,94 @@ header p {
   margin-top: 10px;
   cursor: pointer;
 }
-section {
+
+/* Teams-Bereich */
+#teamsLeader {
   margin-bottom: 30px;
 }
-section h2 {
+#teamsLeader h2 {
   border-bottom: 2px solid #ccc;
   padding-bottom: 5px;
 }
+#teamsContainerLeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.leader-team {
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+/* Fragen-Bereich */
+.difficulty-section {
+  margin-bottom: 30px;
+}
+.difficulty-section h2 {
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+
+/* Raster für Fragen – das Grid passt ideal zur DIN A4 Breite beim Drucken */
+.questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 10px;
+}
 .leader-question {
   background: #fff;
-  padding: 15px;
-  margin: 10px 0;
+  padding: 10px;
   border-radius: 5px;
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
-.leader-question h3 {
-  margin-top: 0;
+.leader-question.current {
+  border: 2px solid #e67e22;
+  background: #fff8e6;
+}
+
+/* Team Transition Effekt in der Hauptansicht (falls er auch gedruckt werden soll) */
+.team-transition {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10000;
+  animation: teamTransition 2.5s ease-in-out forwards;
+}
+.team-transition .next-label {
+  font-size: 1.5em;
+  color: #e67e22;
+  margin-bottom: 0.3em;
+}
+.team-transition .team-name {
+  font-size: 4em;
+  font-weight: bold;
+  color: #ff0000;
+}
+@keyframes teamTransition {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Druckformat: Begrenze die Breite der Raster auf DIN A4 (ca. 210mm minus Ränder) */
+@media print {
+  body {
+    width: 190mm;
+    margin: 0 auto;
+  }
+  .questions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  #teamsContainerLeader {
+    flex-wrap: wrap;
+  }
 }
