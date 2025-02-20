@@ -74,11 +74,13 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 20px;
 }
 
-/* Teams (modernisierte Buttons) */
+/* Teams – unverändert im Grundkonzept, aber mit flex-wrap,
+   sodass bei vielen Teams diese in mehrere Zeilen umgebrochen werden */
 .teams {
   display: flex;
+  flex-wrap: wrap; /* Neu: Mehrere Zeilen bei vielen Teams */
   justify-content: center;
-  gap: 30px;
+  gap: 15px;
   margin: 30px 0;
 }
 .team {
@@ -133,10 +135,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 3px solid #ff0000;
   animation: deathPulse 1.5s ease-in-out infinite;
   transform: rotate(-2deg);
-  box-shadow: 
-    0 0 30px #ff0000,
-    0 0 60px #ff0000,
-    0 0 90px #ff0000;
+  box-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000, 0 0 90px #ff0000;
 }
 @keyframes deathPulse {
   0% { transform: rotate(-2deg) scale(1); }
@@ -210,6 +209,29 @@ h1, h2, h3, h4, h5, h6 {
   left: 125%;
 }
 
+/* Zusätzliche Styles für die Zeiteingabefelder (kompakter und nebeneinander) */
+.time-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.time-settings .control-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.time-settings .control-group label {
+  font-size: 1em;
+  margin: 0;
+}
+.time-settings .control-group input {
+  padding: 5px 10px;
+  font-size: 1em;
+  width: 80px;
+}
+
 /* Inline-Fragencontainer mit Glassmorphism */
 .question-display {
   background: rgba(52,73,94, 0.5);
@@ -267,11 +289,11 @@ h1, h2, h3, h4, h5, h6 {
   animation: teamTransitionNew 2.5s ease-in-out forwards;
 }
 .team-transition .next-label {
-  font-size: 1em;
+  font-size: 10em;
   margin-bottom: 0.2em;
 }
 .team-transition .team-name {
-  font-size: 2em;
+  font-size: 20em;
 }
 @keyframes teamTransitionNew {
   0% { transform: translate(-50%, -50%) scale(0.8); }
