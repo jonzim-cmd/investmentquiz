@@ -107,10 +107,17 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   card.classList.add("selected");
   openInlineQuestionCard = card;
   
-  let seconds = 60;
-  if (difficulty === 'medium') seconds = 90;
-  if (difficulty === 'hard') seconds = 120;
-  if (difficulty === 'death') seconds = 75;
+  // Zeitdauer aus den Eingabefeldern auslesen (Fallback-Werte: easy 60, medium 90, hard 120, death 75)
+  let seconds;
+  if (difficulty === 'easy') {
+    seconds = parseInt(document.getElementById("timeEasy").value, 10) || 60;
+  } else if (difficulty === 'medium') {
+    seconds = parseInt(document.getElementById("timeMedium").value, 10) || 90;
+  } else if (difficulty === 'hard') {
+    seconds = parseInt(document.getElementById("timeHard").value, 10) || 120;
+  } else if (difficulty === 'death') {
+    seconds = parseInt(document.getElementById("timeDeath").value, 10) || 75;
+  }
   timeLeft = seconds;
   timerRunning = false;
   
@@ -119,6 +126,7 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   inlineContainer.className = "question-display";
   inlineContainer.style.gridColumn = "1 / -1";
   
+  // Die Judgement-Buttons werden nun direkt in den Container der Timer-Steuerung integriert.
   let displayHTML = `
     <h3>${question.header ? question.header : `${difficulty.toUpperCase()}-Frage ${index + 1}`} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
     <p>${question.question}</p>
@@ -126,14 +134,14 @@ function toggleInlineQuestion(card, question, difficulty, index) {
     <div class="timer-controls">
       <button id="timerControl">Timer starten</button>
       <button id="resetTimer">Timer zurücksetzen</button>
+      <div class="judgementButtons" style="display:none; margin-left:10px;">
+        <button data-answer="true">Richtig ✅</button>
+        <button data-answer="false">Falsch ❌</button>
+      </div>
     </div>
     <button data-action="showAnswer">Antwort anzeigen</button>
     <div class="explanation" style="display:none">
       ${question.explanation}
-    </div>
-    <div class="judgementButtons" style="display:none; margin-top:20px">
-      <button data-answer="true">Richtig ✅</button>
-      <button data-answer="false">Falsch ❌</button>
     </div>
   `;
   
@@ -156,6 +164,9 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   inlineContainer.querySelector("button[data-answer='false']").addEventListener("click", function() {
     handleAnswer(false);
   });
+  
+  // Automatisch den Timer starten, sobald die Frage geöffnet wird
+  toggleTimer();
 }
 
 function resetTimer() {
@@ -163,10 +174,10 @@ function resetTimer() {
     cat.includes(selectedQuestion)
   )[0];
   
-  if (difficulty === 'easy') timeLeft = 60;
-  else if (difficulty === 'medium') timeLeft = 90;
-  else if (difficulty === 'hard') timeLeft = 120;
-  else timeLeft = 75;
+  if (difficulty === 'easy') timeLeft = parseInt(document.getElementById("timeEasy").value, 10) || 60;
+  else if (difficulty === 'medium') timeLeft = parseInt(document.getElementById("timeMedium").value, 10) || 90;
+  else if (difficulty === 'hard') timeLeft = parseInt(document.getElementById("timeHard").value, 10) || 120;
+  else timeLeft = parseInt(document.getElementById("timeDeath").value, 10) || 75;
   
   updateTimerDisplay();
 }
