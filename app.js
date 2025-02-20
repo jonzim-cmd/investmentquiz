@@ -108,8 +108,8 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   openInlineQuestionCard = card;
   
   let seconds = 60;
-  if (difficulty === 'medium') seconds = 120;
-  if (difficulty === 'hard') seconds = 180;
+  if (difficulty === 'medium') seconds = 90;
+  if (difficulty === 'hard') seconds = 120;
   if (difficulty === 'death') seconds = 75;
   timeLeft = seconds;
   timerRunning = false;
@@ -164,8 +164,8 @@ function resetTimer() {
   )[0];
   
   if (difficulty === 'easy') timeLeft = 60;
-  else if (difficulty === 'medium') timeLeft = 120;
-  else if (difficulty === 'hard') timeLeft = 180;
+  else if (difficulty === 'medium') timeLeft = 90;
+  else if (difficulty === 'hard') timeLeft = 120;
   else timeLeft = 75;
   
   updateTimerDisplay();
