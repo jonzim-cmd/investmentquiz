@@ -271,6 +271,7 @@ function handleAnswer(isCorrect) {
   closeInlineQuestion();
   
   currentTeam = (currentTeam + 1) % teams.length;
+  showTeamTransition(teams[currentTeam].name);
   
   renderTeams();
   createQuestionGrid();
@@ -299,6 +300,7 @@ function nextRound() {
   }
   closeInlineQuestion();
   currentTeam = (currentTeam + 1) % teams.length;
+  showTeamTransition(teams[currentTeam].name);
   renderTeams();
   createQuestionGrid();
   document.getElementById("questionDisplay").innerHTML = `
@@ -369,6 +371,19 @@ function showToast(message) {
   toast.style.zIndex = "1000";
   document.body.appendChild(toast);
   setTimeout(() => { toast.remove(); }, 3000);
+}
+
+/*******************************
+ * Team Transition Effekt
+ *******************************/
+function showTeamTransition(teamName) {
+  const transitionDiv = document.createElement("div");
+  transitionDiv.className = "team-transition";
+  transitionDiv.textContent = teamName;
+  document.body.appendChild(transitionDiv);
+  setTimeout(() => {
+    transitionDiv.remove();
+  }, 2500);
 }
 
 
