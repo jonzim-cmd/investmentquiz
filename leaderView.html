@@ -11,9 +11,18 @@
     <p>Hier sind alle Fragen und Lösungen im Überblick. Nutzen Sie den Druckbutton, um diese Ansicht auszudrucken.</p>
     <button id="printButton">Drucken</button>
   </header>
-  <main id="leaderContainer">
-    <!-- Fragen und Antworten werden hier dynamisch geladen -->
-  </main>
+  
+  <!-- Teams-Bereich: Teams werden in einem responsiven Grid angezeigt -->
+  <section id="teamsLeader">
+    <h2>Teams</h2>
+    <div id="teamsContainerLeader"></div>
+  </section>
+  
+  <!-- Fragen-Bereich: Jede Kategorie (Easy, Medium, Hard, Death) wird in einem eigenen Raster dargestellt -->
+  <section id="questionsLeader">
+    <!-- Die einzelnen Kategorien werden dynamisch eingefügt -->
+  </section>
+  
   <script type="module" src="leaderView.js"></script>
 </body>
 </html>
