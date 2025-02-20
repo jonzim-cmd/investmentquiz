@@ -52,14 +52,16 @@ function startGame(teamCount) {
   renderTeams();
   createQuestionGrid();
   
-  // Quiz-Daten speichern, damit die Spielleitersicht später darauf zugreifen kann
+  // Quiz-Daten und Teams sichern, damit die Spielleitersicht später darauf zugreifen kann
   localStorage.setItem("quizData", JSON.stringify(questions));
+  localStorage.setItem("teams", JSON.stringify(teams));
 }
 
 function renderTeams() {
   const container = document.getElementById("teamsContainer");
+  // Hier wird ein responsives Grid genutzt, damit die Teams immer auf eine Seite passen.
   container.innerHTML = teams.map((team, index) => `
-    <div class="team ${index === currentTeam ? 'active' : ''}">
+    <div class="team">
       <h3>${team.name}</h3>
       <div class="points">${team.points} Punkte</div>
     </div>
@@ -109,6 +111,9 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   question.selected = true;
   card.classList.add("selected");
   openInlineQuestionCard = card;
+  
+  // Speichere in LocalStorage, welche Frage aktuell ausgewählt ist
+  localStorage.setItem("currentQuestion", JSON.stringify({ difficulty, index }));
   
   // Zeitdauer aus den Eingabefeldern auslesen (Fallback-Werte: easy 60, medium 90, hard 120, death 75)
   let seconds;
@@ -270,7 +275,6 @@ function handleAnswer(isCorrect) {
   }
   
   currentQuestion.selected = false;
-  
   closeInlineQuestion();
   
   currentTeam = (currentTeam + 1) % teams.length;
@@ -284,8 +288,9 @@ function handleAnswer(isCorrect) {
     Nächste Runde: ${teams[currentTeam].name}</p>
   `;
   
-  // Quiz-Daten nach jeder Änderung sichern
+  // Quiz-Daten und Teams nach jeder Änderung sichern
   localStorage.setItem("quizData", JSON.stringify(questions));
+  localStorage.setItem("teams", JSON.stringify(teams));
   
   checkGameEnd();
 }
@@ -298,6 +303,7 @@ function closeInlineQuestion() {
   }
   openInlineQuestionCard = null;
   selectedQuestion = null;
+  localStorage.removeItem("currentQuestion");
 }
 
 function nextRound() {
@@ -385,7 +391,8 @@ function showToast(message) {
 function showTeamTransition(teamName) {
   const transitionDiv = document.createElement("div");
   transitionDiv.className = "team-transition";
-  transitionDiv.textContent = teamName;
+  // Füge den Text "als nächstes" hinzu
+  transitionDiv.innerHTML = `<div class="next-label">als nächstes</div><div class="team-name">${teamName}</div>`;
   document.body.appendChild(transitionDiv);
   setTimeout(() => {
     transitionDiv.remove();
@@ -398,4 +405,3 @@ function showTeamTransition(teamName) {
 function openLeaderView() {
   window.open("leaderView.html", "_blank");
 }
-
