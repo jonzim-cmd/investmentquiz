@@ -32,7 +32,7 @@ h1, h2, h3, h4, h5, h6 {
    der automatisch in mehrere Zeilen umbricht, wenn es viele gibt */
 .teams {
   display: flex;
-  flex-wrap: wrap; /* Neu: Mehrere Zeilen */
+  flex-wrap: wrap; /* Teams werden in mehreren Zeilen angeordnet */
   justify-content: center;
   gap: 15px;
   margin: 30px 0;
@@ -57,6 +57,24 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 24px;
   color: #e67e22;
   margin: 10px 0;
+}
+
+/* Eingabefelder für die Teamnamen im gleichen Stil wie der ursprüngliche Text */
+.team-name-input {
+  font-family: inherit;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--heading-color);
+  background: transparent;
+  border: none;
+  text-align: center;
+  width: 100%;
+  outline: none;
+  /* Bei Fokussierung wird ein subtiler Rahmen angezeigt */
+}
+
+.team-name-input:focus {
+  border-bottom: 2px solid var(--heading-color);
 }
 
 /* Responsives Grid-Layout für die Fragen */
