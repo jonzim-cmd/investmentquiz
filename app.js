@@ -52,20 +52,29 @@ function startGame(teamCount) {
   renderTeams();
   createQuestionGrid();
   
-  // Quiz-Daten und Teams sichern, damit die Spielleitersicht später darauf zugreifen kann
+  // Quiz-Daten und Teams sichern, damit die Leader View live aktualisiert werden kann
   localStorage.setItem("quizData", JSON.stringify(questions));
   localStorage.setItem("teams", JSON.stringify(teams));
 }
 
 function renderTeams() {
   const container = document.getElementById("teamsContainer");
-  // Hier wird ein responsives Grid genutzt, damit die Teams immer auf eine Seite passen.
+  // Teamnamen als editierbare Input-Felder darstellen
   container.innerHTML = teams.map((team, index) => `
     <div class="team">
-      <h3>${team.name}</h3>
+      <input type="text" class="team-name-input" data-index="${index}" value="${team.name}" />
       <div class="points">${team.points} Punkte</div>
     </div>
   `).join('');
+  
+  // Event-Listener, um Änderungen der Teamnamen zu speichern
+  document.querySelectorAll(".team-name-input").forEach(input => {
+    input.addEventListener("change", (e) => {
+      const idx = e.target.getAttribute("data-index");
+      teams[idx].name = e.target.value;
+      localStorage.setItem("teams", JSON.stringify(teams));
+    });
+  });
 }
 
 function createQuestionGrid() {
@@ -112,10 +121,9 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   card.classList.add("selected");
   openInlineQuestionCard = card;
   
-  // Speichere in LocalStorage, welche Frage aktuell ausgewählt ist
+  // Speichere, welche Frage aktuell ausgewählt ist
   localStorage.setItem("currentQuestion", JSON.stringify({ difficulty, index }));
   
-  // Zeitdauer aus den Eingabefeldern auslesen (Fallback-Werte: easy 60, medium 90, hard 120, death 75)
   let seconds;
   if (difficulty === 'easy') {
     seconds = parseInt(document.getElementById("timeEasy").value, 10) || 60;
@@ -134,7 +142,6 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   inlineContainer.className = "question-display";
   inlineContainer.style.gridColumn = "1 / -1";
   
-  // Die Judgement-Buttons werden in den Container der Timer-Steuerung integriert.
   let displayHTML = `
     <h3>${question.header ? question.header : `${difficulty.toUpperCase()}-Frage ${index + 1}`} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
     <p>${question.question}</p>
@@ -163,7 +170,6 @@ function toggleInlineQuestion(card, question, difficulty, index) {
     resetTimer();
   });
   
-  // Toggle: Beim Klick auf "Antwort anzeigen" wird die Antwort ein- oder ausgeblendet.
   inlineContainer.querySelector("button[data-action='showAnswer']").addEventListener("click", function() {
     const explanation = inlineContainer.querySelector(".explanation");
     const judgementButtons = inlineContainer.querySelector(".judgementButtons");
@@ -183,7 +189,6 @@ function toggleInlineQuestion(card, question, difficulty, index) {
     handleAnswer(false);
   });
   
-  // Automatisch den Timer starten, sobald die Frage geöffnet wird
   toggleTimer();
 }
 
@@ -288,7 +293,6 @@ function handleAnswer(isCorrect) {
     Nächste Runde: ${teams[currentTeam].name}</p>
   `;
   
-  // Quiz-Daten und Teams nach jeder Änderung sichern
   localStorage.setItem("quizData", JSON.stringify(questions));
   localStorage.setItem("teams", JSON.stringify(teams));
   
@@ -336,7 +340,6 @@ function checkGameEnd() {
 }
 
 function resetAll() {
-  // Reset global state
   teams = [];
   currentTeam = 0;
   selectedQuestion = null;
@@ -344,20 +347,17 @@ function resetAll() {
   timerRunning = false;
   openInlineQuestionCard = null;
   
-  // Clear UI elements
   document.getElementById("teamsContainer").innerHTML = "";
   document.getElementById("questionsGrid").innerHTML = 
     `<p style="text-align:center; color:#ccc;">Noch keine Fragen importiert. Bitte laden Sie einen Excel Report hoch.</p>`;
   document.getElementById("questionDisplay").style.display = "none";
   document.getElementById("controls").style.display = "none";
   
-  // Clear questions arrays
   questions.easy = [];
   questions.medium = [];
   questions.hard = [];
   questions.death = [];
   
-  // Reset file input to allow re-uploading the same file
   const excelInput = document.getElementById("excelUpload");
   if (excelInput) {
     excelInput.value = '';
@@ -386,12 +386,11 @@ function showToast(message) {
 }
 
 /*******************************
- * Team Transition Effekt
+ * Team Transition Effekt (neuer Stil)
  *******************************/
 function showTeamTransition(teamName) {
   const transitionDiv = document.createElement("div");
   transitionDiv.className = "team-transition";
-  // Füge den Text "als nächstes" hinzu
   transitionDiv.innerHTML = `<div class="next-label">als nächstes</div><div class="team-name">${teamName}</div>`;
   document.body.appendChild(transitionDiv);
   setTimeout(() => {
