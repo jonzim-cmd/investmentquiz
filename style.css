@@ -347,3 +347,29 @@ h1, h2, h3, h4, h5, h6 {
   /* Falls nötig: Textfarbe explizit auf Weiß setzen */
   color: #fff;
 }
+
+/* Team Transitionseffekt (für den nächsten Teamwechsel) */
+.team-transition {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10000;
+  font-weight: bold;
+  color: black;
+  -webkit-text-stroke: 3px white;
+  animation: teamTransitionNew 2.5s ease-in-out forwards;
+}
+.team-transition .next-label {
+  font-size: 6em;
+  margin-bottom: 0.2em;
+}
+.team-transition .team-name {
+  font-size: 12em;
+}
+@keyframes teamTransitionNew {
+  0% { transform: translate(-50%, -50%) scale(0.8); }
+  50% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-50%, -50%) scale(1.2); }
+}
