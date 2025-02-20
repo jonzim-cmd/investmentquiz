@@ -126,7 +126,7 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   inlineContainer.className = "question-display";
   inlineContainer.style.gridColumn = "1 / -1";
   
-  // Die Judgement-Buttons werden nun direkt in den Container der Timer-Steuerung integriert.
+  // Die Judgement-Buttons werden in den Container der Timer-Steuerung integriert.
   let displayHTML = `
     <h3>${question.header ? question.header : `${difficulty.toUpperCase()}-Frage ${index + 1}`} (${question.attempts > 0 ? Math.floor(question.points / 2) : question.points} Punkte)</h3>
     <p>${question.question}</p>
@@ -154,10 +154,20 @@ function toggleInlineQuestion(card, question, difficulty, index) {
   inlineContainer.querySelector("#resetTimer").addEventListener("click", () => {
     resetTimer();
   });
+  
+  // Toggle: Beim Klick auf "Antwort anzeigen" wird die Antwort ein- oder ausgeblendet.
   inlineContainer.querySelector("button[data-action='showAnswer']").addEventListener("click", function() {
-    inlineContainer.querySelector(".explanation").style.display = 'block';
-    inlineContainer.querySelector(".judgementButtons").style.display = 'block';
+    const explanation = inlineContainer.querySelector(".explanation");
+    const judgementButtons = inlineContainer.querySelector(".judgementButtons");
+    if (explanation.style.display === 'block') {
+      explanation.style.display = 'none';
+      judgementButtons.style.display = 'none';
+    } else {
+      explanation.style.display = 'block';
+      judgementButtons.style.display = 'block';
+    }
   });
+  
   inlineContainer.querySelector("button[data-answer='true']").addEventListener("click", function() {
     handleAnswer(true);
   });
@@ -360,3 +370,5 @@ function showToast(message) {
   document.body.appendChild(toast);
   setTimeout(() => { toast.remove(); }, 3000);
 }
+
+
