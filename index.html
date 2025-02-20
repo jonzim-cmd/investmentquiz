@@ -26,21 +26,39 @@
     <button onclick="openAnleitung()">Anleitung</button>
   </div>
 
-  <!-- Spielsteuerung: erst nach Excel-Import wird hier die Teamauswahl angezeigt -->
+  <!-- Spielsteuerung: erst nach Excel-Import wird hier die Teamauswahl und Zeitdauer-Eingabe angezeigt -->
   <div class="controls" id="controls" style="display: none;">
-    <label for="teamCount" style="color: var(--heading-color); font-size: 1.2em;">Anzahl der Teams:</label>
-    <select id="teamCount">
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-    </select>
+    <div class="control-group">
+      <label for="teamCount" style="color: var(--heading-color); font-size: 1.2em;">Anzahl der Teams:</label>
+      <select id="teamCount">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="timeEasy" style="color: var(--heading-color); font-size: 1.2em;">Easy Zeit (Sek.):</label>
+      <input type="number" id="timeEasy" value="60" min="10">
+    </div>
+    <div class="control-group">
+      <label for="timeMedium" style="color: var(--heading-color); font-size: 1.2em;">Medium Zeit (Sek.):</label>
+      <input type="number" id="timeMedium" value="90" min="10">
+    </div>
+    <div class="control-group">
+      <label for="timeHard" style="color: var(--heading-color); font-size: 1.2em;">Hard Zeit (Sek.):</label>
+      <input type="number" id="timeHard" value="120" min="10">
+    </div>
+    <div class="control-group">
+      <label for="timeDeath" style="color: var(--heading-color); font-size: 1.2em;">Death Zeit (Sek.):</label>
+      <input type="number" id="timeDeath" value="75" min="10">
+    </div>
     <button onclick="initGame()">Spiel starten</button>
   </div>
 
