@@ -345,3 +345,23 @@ h1, h2, h3, h4, h5, h6 {
   padding-right: 10px;
   color: #fff;
 }
+
+/* Team Transition Effekt */
+.team-transition {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4em;
+  color: rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  z-index: 10000;
+  animation: teamTransition 2.5s ease-in-out forwards;
+}
+
+@keyframes teamTransition {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
