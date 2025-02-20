@@ -12,7 +12,6 @@ function renderLeaderView() {
   const questionsLeader = document.getElementById("questionsLeader");
   questionsLeader.innerHTML = "";
 
-  // Für jede Kategorie wird ein Raster (Grid) erzeugt.
   for (const difficulty in quizData) {
     const questionsArray = quizData[difficulty];
     if (questionsArray && questionsArray.length > 0) {
@@ -24,7 +23,6 @@ function renderLeaderView() {
       grid.className = "questions-grid";
       
       questionsArray.forEach((q, index) => {
-        // Prüfe, ob dies die aktuell ausgewählte Frage ist
         const isCurrent =
           currentQ &&
           currentQ.difficulty === difficulty &&
@@ -53,7 +51,6 @@ function renderTeamsLeader() {
   const teamsContainer = document.getElementById("teamsContainerLeader");
   teamsContainer.innerHTML = "";
   
-  // Teams werden in einem flexiblen Grid dargestellt, sodass sie immer auf eine Seite passen.
   teamsData.forEach(team => {
     const teamDiv = document.createElement("div");
     teamDiv.className = "leader-team";
@@ -64,6 +61,14 @@ function renderTeamsLeader() {
 
 document.getElementById("printButton").addEventListener("click", () => {
   window.print();
+});
+
+// Live-Aktualisierung: Wird in einem anderen Fenster (Leader View) ein Storage-Event ausgelöst, aktualisiere die Ansicht.
+window.addEventListener("storage", (e) => {
+  if(e.key === "teams" || e.key === "quizData" || e.key === "currentQuestion"){
+    renderLeaderView();
+    renderTeamsLeader();
+  }
 });
 
 renderLeaderView();
