@@ -52,29 +52,25 @@ function startGame(teamCount) {
   renderTeams();
   createQuestionGrid();
   
-  // Quiz-Daten und Teams sichern, damit die Leader View live aktualisiert werden kann
+  // Quiz-Daten und Teams sichern, damit die LeaderView live aktualisiert werden kann
   localStorage.setItem("quizData", JSON.stringify(questions));
   localStorage.setItem("teams", JSON.stringify(teams));
 }
 
 function renderTeams() {
   const container = document.getElementById("teamsContainer");
-  // Teamnamen als editierbare Input-Felder darstellen
+  // Teamnamen werden wie zuvor als h3 angezeigt – nun mit contenteditable und onblur, damit sie editierbar bleiben
   container.innerHTML = teams.map((team, index) => `
-    <div class="team">
-      <input type="text" class="team-name-input" data-index="${index}" value="${team.name}" />
+    <div class="team ${index === currentTeam ? 'active' : ''}">
+      <h3 contenteditable="true" onblur="updateTeamName(this, ${index})">${team.name}</h3>
       <div class="points">${team.points} Punkte</div>
     </div>
   `).join('');
-  
-  // Event-Listener, um Änderungen der Teamnamen zu speichern
-  document.querySelectorAll(".team-name-input").forEach(input => {
-    input.addEventListener("change", (e) => {
-      const idx = e.target.getAttribute("data-index");
-      teams[idx].name = e.target.value;
-      localStorage.setItem("teams", JSON.stringify(teams));
-    });
-  });
+}
+
+function updateTeamName(element, index) {
+  teams[index].name = element.textContent.trim() || `Team ${index+1}`;
+  localStorage.setItem("teams", JSON.stringify(teams));
 }
 
 function createQuestionGrid() {
@@ -366,9 +362,6 @@ function resetAll() {
   showToast("Alles zurückgesetzt!");
 }
 
-/*******************************
- * Toast-Funktion
- *******************************/
 function showToast(message) {
   const toast = document.createElement("div");
   toast.textContent = message;
@@ -385,9 +378,6 @@ function showToast(message) {
   setTimeout(() => { toast.remove(); }, 3000);
 }
 
-/*******************************
- * Team Transition Effekt (neuer Stil)
- *******************************/
 function showTeamTransition(teamName) {
   const transitionDiv = document.createElement("div");
   transitionDiv.className = "team-transition";
@@ -398,9 +388,6 @@ function showTeamTransition(teamName) {
   }, 2500);
 }
 
-/*******************************
- * Öffnet die Spielleiteransicht in einem neuen Fenster
- *******************************/
 function openLeaderView() {
   window.open("leaderView.html", "_blank");
 }
