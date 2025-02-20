@@ -51,6 +51,9 @@ function startGame(teamCount) {
   timerRunning = false;
   renderTeams();
   createQuestionGrid();
+  
+  // Quiz-Daten speichern, damit die Spielleitersicht später darauf zugreifen kann
+  localStorage.setItem("quizData", JSON.stringify(questions));
 }
 
 function renderTeams() {
@@ -281,6 +284,9 @@ function handleAnswer(isCorrect) {
     Nächste Runde: ${teams[currentTeam].name}</p>
   `;
   
+  // Quiz-Daten nach jeder Änderung sichern
+  localStorage.setItem("quizData", JSON.stringify(questions));
+  
   checkGameEnd();
 }
 
@@ -386,4 +392,10 @@ function showTeamTransition(teamName) {
   }, 2500);
 }
 
+/*******************************
+ * Öffnet die Spielleiteransicht in einem neuen Fenster
+ *******************************/
+function openLeaderView() {
+  window.open("leaderView.html", "_blank");
+}
 
