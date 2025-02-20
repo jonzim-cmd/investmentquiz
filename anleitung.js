@@ -1,12 +1,19 @@
 function openAnleitung() {
-  let overlay = document.createElement("div");
+  const overlay = document.createElement("div");
   overlay.id = "anleitungOverlay";
   overlay.className = "anleitung-overlay";
   
-  let modal = document.createElement("div");
+  // Schließt die Anleitung, wenn außerhalb des Modals geklickt wird
+  overlay.addEventListener("click", function(e) {
+    if (e.target === overlay) {
+      closeAnleitung();
+    }
+  });
+  
+  const modal = document.createElement("div");
   modal.className = "anleitung-modal";
   
-  let closeButton = document.createElement("span");
+  const closeButton = document.createElement("span");
   closeButton.className = "anleitung-close";
   closeButton.innerHTML = "&times;";
   closeButton.onclick = closeAnleitung;
@@ -21,7 +28,7 @@ function openAnleitung() {
       return response.text();
     })
     .then(html => {
-      let contentContainer = document.createElement("div");
+      const contentContainer = document.createElement("div");
       contentContainer.className = "anleitung-content-container";
       contentContainer.innerHTML = html;
       modal.appendChild(contentContainer);
@@ -35,7 +42,7 @@ function openAnleitung() {
 }
 
 function closeAnleitung() {
-  let overlay = document.getElementById("anleitungOverlay");
+  const overlay = document.getElementById("anleitungOverlay");
   if (overlay) {
     document.body.removeChild(overlay);
   }
