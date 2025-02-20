@@ -240,12 +240,27 @@ h1, h2, h3, h4, h5, h6 {
   left: 125%;
 }
 
-/* Zusätzliche Styles für die neuen Eingabefelder */
-.controls .control-group {
+/* Zusätzliche Styles für die Zeiteinstellungsfelder */
+.time-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.time-settings .control-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   margin-bottom: 10px;
 }
-.controls .control-group label {
-  margin-right: 10px;
+.time-settings .control-group label {
+  font-size: 1em;
+  margin: 0;
+}
+.time-settings .control-group input {
+  padding: 5px 10px;
+  font-size: 1em;
+  width: 80px;
 }
 
 /* Inline-Fragencontainer mit Glassmorphism */
@@ -298,15 +313,15 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.9);  /* dunkler als vorher */
+  background: rgba(0,0,0,0.9);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
 }
 .anleitung-modal {
-  background: #222;  /* dunkles Modal */
-  color: #fff;       /* weiße Schrift */
+  background: #222;
+  color: #fff;
   width: 80%;
   max-width: 600px;
   max-height: 80%;
