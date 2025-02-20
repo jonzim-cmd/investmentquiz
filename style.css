@@ -289,11 +289,11 @@ h1, h2, h3, h4, h5, h6 {
   animation: teamTransitionNew 2.5s ease-in-out forwards;
 }
 .team-transition .next-label {
-  font-size: 10em;
+  font-size: 6em;
   margin-bottom: 0.2em;
 }
 .team-transition .team-name {
-  font-size: 20em;
+  font-size: 12em;
 }
 @keyframes teamTransitionNew {
   0% { transform: translate(-50%, -50%) scale(0.8); }
