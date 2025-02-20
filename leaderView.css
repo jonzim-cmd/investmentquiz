@@ -74,7 +74,7 @@ header p {
   background: #fff8e6;
 }
 
-/* Neuer Team Transition Effekt */
+/* Neuer Team Transitionseffekt in der LeaderView */
 .team-transition {
   position: fixed;
   top: 50%;
@@ -85,7 +85,6 @@ header p {
   font-weight: bold;
   color: red;
   -webkit-text-stroke: 1px white;
-  /* Animation: Nur Skalierung, keine Transparenz */
   animation: teamTransitionNew 2.5s ease-in-out forwards;
 }
 .team-transition .next-label {
