@@ -63,7 +63,7 @@ document.getElementById("printButton").addEventListener("click", () => {
   window.print();
 });
 
-// Live-Aktualisierung: Wird in einem anderen Fenster (Leader View) ein Storage-Event ausgelöst, aktualisiere die Ansicht.
+// Live-Aktualisierung über das storage-Event:
 window.addEventListener("storage", (e) => {
   if(e.key === "teams" || e.key === "quizData" || e.key === "currentQuestion"){
     renderLeaderView();
