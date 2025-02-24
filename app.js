@@ -215,22 +215,34 @@ function toggleTimer() {
 }
 
 function startTimer(seconds) {
+  // Erst sicherstellen, dass kein anderer Timer läuft
+  clearInterval(countdownInterval);
+  
   timeLeft = seconds;
   updateTimerDisplay();
   
+  // Start- und Endzeit verwenden, um Drift zu verhindern
+  const startTime = Date.now();
+  const endTime = startTime + (seconds * 1000);
+  
   countdownInterval = setInterval(() => {
-    if (timerRunning) {
-      timeLeft--;
+    if (!timerRunning) return;
+    
+    const currentTime = Date.now();
+    const remainingTime = Math.ceil((endTime - currentTime) / 1000);
+    
+    if (remainingTime <= 0) {
+      clearInterval(countdownInterval);
+      timeLeft = 0;
       updateTimerDisplay();
-      
-      if (timeLeft <= 0) {
-        clearInterval(countdownInterval);
-        if (selectedQuestion && !selectedQuestion.joker) {
-          handleAnswer(false);
-        }
+      if (selectedQuestion && !selectedQuestion.joker) {
+        handleAnswer(false);
       }
+    } else {
+      timeLeft = remainingTime;
+      updateTimerDisplay();
     }
-  }, 1000);
+  }, 100); // Häufigeres Aktualisieren für genauere Anzeige
 }
 
 function updateTimerDisplay() {
